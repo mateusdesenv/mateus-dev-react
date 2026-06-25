@@ -11,7 +11,7 @@ const navItems = [
   ['Contato', '#contato'],
 ];
 
-function Header() {
+function Header({ onOpenCoffeeModal }) {
   return (
     <header className="site-header">
       <a className="brand" href="#inicio" aria-label="Ir para o início">
@@ -26,12 +26,20 @@ function Header() {
         {navItems.map(([label, href]) => (
           <a key={href} href={href}>{label}</a>
         ))}
+        <button type="button" onClick={onOpenCoffeeModal}>
+          Me pague um café
+        </button>
       </nav>
 
-      <a className="header-cta" href={`mailto:${profile.contact.email}`}>
-        <Icon name="send" size={18} />
-        Fale comigo
-      </a>
+      <div className="header-actions">
+        <button className="header-coffee" type="button" onClick={onOpenCoffeeModal}>
+          Café
+        </button>
+        <a className="header-cta" href={`mailto:${profile.contact.email}`}>
+          <Icon name="send" size={18} />
+          Fale comigo
+        </a>
+      </div>
     </header>
   );
 }
