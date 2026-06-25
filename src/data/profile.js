@@ -5,7 +5,7 @@ export const profile = {
   availability: 'Disponível para novos projetos',
   heroText:
     'Desenvolvo aplicações web completas com foco em performance, arquitetura limpa e soluções que geram resultados reais.',
-  photo: '/profile.png',
+  photo: '/profile.webp',
   contact: {
     email: 'mateus.desenv@gmail.com',
     github: 'https://github.com/mateusdesenv',
