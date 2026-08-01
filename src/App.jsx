@@ -6,6 +6,7 @@ import Education from './components/Education';
 import Experience from './components/Experience';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import InteractiveGrid from './components/InteractiveGrid';
 import Projects from './components/Projects';
 import Skills from './components/Skills';
 
@@ -37,6 +38,7 @@ function App() {
 
   return (
     <>
+      <InteractiveGrid />
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <Header onOpenCoffeeModal={openCoffeeModal} theme={theme} onToggleTheme={toggleTheme} />
       <main className="page-shell" id="conteudo">
