@@ -3,10 +3,13 @@ import Icon from './Icon';
 
 function Skills() {
   return (
-    <section className="panel section-block" id="skills">
-      <div className="section-title">
-        <Icon name="server" />
-        <h2>Skills & Ferramentas</h2>
+    <section className="section-block" id="skills">
+      <div className="section-heading section-heading--row">
+        <div>
+          <span className="section-kicker">04 · STACK</span>
+          <h2>Ferramentas certas para cada desafio.</h2>
+        </div>
+        <p>Da interface à infraestrutura, uma stack completa para entregar com autonomia e qualidade.</p>
       </div>
 
       <div className="skills-grid">

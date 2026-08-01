@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import About from './components/About';
 import CoffeeModal from './components/CoffeeModal';
 import Contact from './components/Contact';
@@ -11,6 +11,17 @@ import Skills from './components/Skills';
 
 function App() {
   const [isCoffeeModalOpen, setIsCoffeeModalOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = window.localStorage.getItem('mateus-dev-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem('mateus-dev-theme', theme);
+  }, [theme]);
 
   const openCoffeeModal = useCallback(() => {
     setIsCoffeeModalOpen(true);
@@ -20,15 +31,20 @@ function App() {
     setIsCoffeeModalOpen(false);
   }, []);
 
+  const toggleTheme = useCallback(() => {
+    setTheme((currentTheme) => currentTheme === 'light' ? 'dark' : 'light');
+  }, []);
+
   return (
     <>
-      <Header onOpenCoffeeModal={openCoffeeModal} />
-      <main className="page-shell">
-        <Hero />
+      <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
+      <Header onOpenCoffeeModal={openCoffeeModal} theme={theme} onToggleTheme={toggleTheme} />
+      <main className="page-shell" id="conteudo">
+        <Hero onOpenCoffeeModal={openCoffeeModal} />
         <About />
         <Experience />
-        <Skills />
         <Projects />
+        <Skills />
         <Education />
         <Contact />
       </main>

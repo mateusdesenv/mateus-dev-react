@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createCardPayment, createPixPayment } from '../services/coffeePaymentService';
+import Icon from './Icon';
 
 const PAYMENT_METHODS = {
   pix: 'Pix',
@@ -65,6 +66,9 @@ function CoffeeModal({ isOpen, onClose }) {
       return undefined;
     }
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         onClose();
@@ -76,6 +80,7 @@ function CoffeeModal({ isOpen, onClose }) {
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose]);
 
@@ -301,7 +306,7 @@ function CoffeeModal({ isOpen, onClose }) {
         onMouseDown={(event) => event.stopPropagation()}
       >
         <button className="coffee-modal-close" type="button" onClick={onClose} aria-label="Fechar modal">
-          ×
+          <Icon name="close" size={20} />
         </button>
 
         <div className="coffee-modal-head">
@@ -363,8 +368,8 @@ function CoffeeModal({ isOpen, onClose }) {
               Pagamentos temporariamente indisponíveis.
             </p>
           )}
-          {error && <p id="coffee-modal-error" className="coffee-form-message is-error">{error}</p>}
-          {feedback && <p className="coffee-form-message is-success">{feedback}</p>}
+          {error && <p id="coffee-modal-error" className="coffee-form-message is-error" role="alert">{error}</p>}
+          {feedback && <p className="coffee-form-message is-success" aria-live="polite">{feedback}</p>}
 
           {pixPayment && (
             <div className="coffee-pix-result">
