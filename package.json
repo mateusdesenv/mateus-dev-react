@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@andespindola/agent-particles": "^0.12.5",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",
