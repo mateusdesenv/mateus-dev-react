@@ -8,6 +8,7 @@ const STEVE_WIDTH = 48;
 const CREEPER_SPEED = 105;
 const STEVE_SPEED = 82;
 const STEVE_ESCAPE_SPEED = 148;
+const STEVE_MANUAL_SPEED = 190;
 const STEVE_DANGER_RANGE = 180;
 const DIRECTION_LOCK_TIME = 550;
 const SKELETON_MIN_SHOT_INTERVAL = 5000;
@@ -34,6 +35,7 @@ const MOBS = [
 ];
 
 const SKINS = [
+  { id: 'steve', label: 'Steve' },
   { id: 'technoblade', label: 'Technoblade' },
   { id: 'viniccius13', label: 'Viniccius 13' },
   { id: 'daviGamer', label: 'Davi Gamer' },
@@ -47,6 +49,7 @@ const SKINS = [
 ];
 
 const SKIN_COLORS = {
+  steve: { skin: '#b96f50', skinLight: '#d9966b', hair: '#39251d', shirt: '#188f91', shirtLight: '#35b8b1', shirtDark: '#0c6269', pants: '#263b9b', boots: '#151c4b' },
   technoblade: { skin: '#ef9c91', skinLight: '#ffc0b3', hair: '#d86673', shirt: '#a71f32', shirtLight: '#d43743', shirtDark: '#681522', pants: '#26252e', boots: '#111117' },
   viniccius13: { skin: '#d19a68', skinLight: '#edb77d', hair: '#111213', shirt: '#d90d15', shirtLight: '#f21a20', shirtDark: '#7d080d', pants: '#11131d', boots: '#49171b' },
   daviGamer: { skin: '#9f5e3f', skinLight: '#ca825d', hair: '#32180c', shirt: '#07183a', shirtLight: '#0a4f9d', shirtDark: '#020817', pants: '#071022', boots: '#02040a' },
@@ -72,6 +75,7 @@ function SkinDockIcon({ skin }) {
       <path fill={skin === 'venomExtreme' ? '#71d64f' : '#f5f2e9'} d="M4 7h3v2H4zM10 7h3v2h-3z" />
       <path fill={skin === 'venomExtreme' ? '#07100a' : '#2f5363'} d="M6 7h1v2H6zM10 7h1v2h-1z" />
       {isTechno && <path fill="#9d4e51" d="M6 10h5v3H6zM5 11h1v2H5zM11 11h1v2h-1z" />}
+      {skin === 'steve' && <path fill="#5a3629" d="M3 9h2v4h2v2h5v-2h2V9h-2v2h-2v2H7v-2H5V9z" />}
       {skin === 'leon' && <path fill="#34241f" d="M3 6h5v4H3zM9 6h5v4H9zM7 7h3v1H7zM5 11h7v3H5z" fillOpacity=".8" />}
       {skin === 'authenticGames' && <path fill="#fff" d="M3 13h10v2H3z" />}
       {skin === 'viniccius13' && <path fill="#f5f3eb" d="M5 9h7v4H5z" />}
@@ -118,6 +122,8 @@ function CharacterSkin({ skin }) {
             <path fill="#f8f4eb" d="M14 14h8v5h-8zM27 14h7v5h-7z" />
             <path fill={skin === 'venomExtreme' ? '#63d64c' : '#3c7187'} d="M19 14h3v5h-3zM27 14h3v5h-3z" />
             <path fill="#744331" d="M20 24h10v3H20z" />
+            {skin === 'steve' && <path fill="#5a3629" d="M10 20h4v8h5v4h15v-4h4v-8h-4v5h-5v3H20v-3h-6v-5z" />}
+            {skin === 'steve' && <path fill={colors.skin} d="M22 19h6v6h-6z" />}
             {skin === 'viniccius13' && <path fill="#eeeee9" d="M16 19h18v11H16z" />}
             {skin === 'viniccius13' && <path fill="#101116" d="M19 14h3v5h-3zM27 14h3v5h-3zM21 29h10v4H21z" />}
             {skin === 'viniccius13' && <path fill="#f1f0eb" d="M8 4h4V1h25v3h4v20h-3V7h-3V4H14v3h-3v17H8z" />}
@@ -276,7 +282,9 @@ function MobDockIcon({ mob }) {
 
 function CreeperMascot() {
   const [selectedMob, setSelectedMob] = useState('creeper');
-  const [selectedSkin, setSelectedSkin] = useState('technoblade');
+  const [selectedSkin, setSelectedSkin] = useState('steve');
+  const [isManualControl, setIsManualControl] = useState(false);
+  const [isSteveMoving, setIsSteveMoving] = useState(true);
   const [status, setStatus] = useState('walking');
   const [steveDirection, setSteveDirection] = useState('right');
   const [creeperDirection, setCreeperDirection] = useState('right');
@@ -301,7 +309,11 @@ function CreeperMascot() {
   const endermanTeleportingRef = useRef(false);
   const endermanWalkingRef = useRef(false);
   const stevePositionRef = useRef(Math.max(64, window.innerWidth - 64));
+  const steveVerticalPositionRef = useRef(0);
   const steveDirectionRef = useRef(steveDirection);
+  const manualControlRef = useRef(false);
+  const pressedKeysRef = useRef(new Set());
+  const steveMovingRef = useRef(true);
   const creeperPositionRef = useRef(12);
   const creeperDirectionRef = useRef(creeperDirection);
   const lastDirectionChangeRef = useRef(0);
@@ -336,9 +348,10 @@ function CreeperMascot() {
         const currentCreeperX = creeperPositionRef.current;
         const creeperRight = currentCreeperX + CREEPER_WIDTH;
         const steveRight = steveX + STEVE_WIDTH;
-        const gap = currentCreeperX <= steveX
+        const horizontalGap = currentCreeperX <= steveX
           ? Math.max(0, steveX - creeperRight)
           : Math.max(0, currentCreeperX - steveRight);
+        const gap = Math.hypot(horizontalGap, steveVerticalPositionRef.current);
 
         if (selectedMob === 'creeper') {
           const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
@@ -348,7 +361,7 @@ function CreeperMascot() {
           cancelExplosion();
         }
 
-        if (selectedMob !== 'enderman' && gap <= STEVE_DANGER_RANGE && time - lastDirectionChangeRef.current >= DIRECTION_LOCK_TIME) {
+        if (!manualControlRef.current && selectedMob !== 'enderman' && gap <= STEVE_DANGER_RANGE && time - lastDirectionChangeRef.current >= DIRECTION_LOCK_TIME) {
           const creeperCenter = currentCreeperX + (CREEPER_WIDTH / 2);
           const steveCenter = steveX + (STEVE_WIDTH / 2);
           const escapeDirection = steveCenter >= creeperCenter ? 'right' : 'left';
@@ -360,8 +373,42 @@ function CreeperMascot() {
           }
         }
 
-        const steveSpeed = statusRef.current === 'walking' ? STEVE_SPEED : STEVE_ESCAPE_SPEED;
-        let nextSteveX = steveX + (steveDirectionRef.current === 'right' ? 1 : -1) * steveSpeed * elapsed;
+        let nextSteveX = steveX;
+
+        if (manualControlRef.current) {
+          const horizontalInput = (pressedKeysRef.current.has('d') ? 1 : 0)
+            - (pressedKeysRef.current.has('a') ? 1 : 0);
+          const verticalInput = (pressedKeysRef.current.has('w') ? 1 : 0)
+            - (pressedKeysRef.current.has('s') ? 1 : 0);
+          const isMoving = horizontalInput !== 0 || verticalInput !== 0;
+          const diagonalScale = horizontalInput !== 0 && verticalInput !== 0 ? Math.SQRT1_2 : 1;
+
+          if (isMoving !== steveMovingRef.current) {
+            steveMovingRef.current = isMoving;
+            setIsSteveMoving(isMoving);
+          }
+
+          if (horizontalInput !== 0) {
+            const nextDirection = horizontalInput > 0 ? 'right' : 'left';
+            if (nextDirection !== steveDirectionRef.current) {
+              steveDirectionRef.current = nextDirection;
+              setSteveDirection(nextDirection);
+            }
+          }
+
+          nextSteveX += horizontalInput * STEVE_MANUAL_SPEED * diagonalScale * elapsed;
+          const maxVerticalPosition = Math.max(0, window.innerHeight - 118);
+          steveVerticalPositionRef.current = Math.max(
+            0,
+            Math.min(
+              maxVerticalPosition,
+              steveVerticalPositionRef.current + verticalInput * STEVE_MANUAL_SPEED * diagonalScale * elapsed,
+            ),
+          );
+        } else {
+          const steveSpeed = statusRef.current === 'walking' ? STEVE_SPEED : STEVE_ESCAPE_SPEED;
+          nextSteveX += (steveDirectionRef.current === 'right' ? 1 : -1) * steveSpeed * elapsed;
+        }
 
         if (nextSteveX > window.innerWidth) nextSteveX = -STEVE_WIDTH;
         if (nextSteveX < -STEVE_WIDTH) nextSteveX = window.innerWidth;
@@ -408,6 +455,7 @@ function CreeperMascot() {
         }
 
         mascotRef.current?.style.setProperty('--steve-x', `${Math.round(stevePositionRef.current)}px`);
+        mascotRef.current?.style.setProperty('--steve-y', `${Math.round(-steveVerticalPositionRef.current)}px`);
         mascotRef.current?.style.setProperty('--creeper-x', `${Math.round(creeperPositionRef.current)}px`);
       }
 
@@ -455,6 +503,39 @@ function CreeperMascot() {
       window.removeEventListener('blur', handlePointerExit);
     };
   }, [selectedMob]);
+
+  useEffect(() => {
+    const interactiveTags = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+
+    const handleKeyDown = (event) => {
+      if (!manualControlRef.current || event.repeat) return;
+      if (interactiveTags.has(event.target.tagName) || event.target.isContentEditable) return;
+
+      const key = event.key.toLowerCase();
+      if (!['w', 'a', 's', 'd'].includes(key)) return;
+
+      event.preventDefault();
+      pressedKeysRef.current.add(key);
+    };
+
+    const handleKeyUp = (event) => {
+      const key = event.key.toLowerCase();
+      if (!['w', 'a', 's', 'd'].includes(key)) return;
+      pressedKeysRef.current.delete(key);
+    };
+
+    const releaseKeys = () => pressedKeysRef.current.clear();
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', releaseKeys);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', releaseKeys);
+    };
+  }, []);
 
   useEffect(() => {
     window.clearTimeout(endermanScheduleRef.current);
@@ -645,12 +726,36 @@ function CreeperMascot() {
     setSelectedMob(mob);
   };
 
+  const toggleCharacterControl = () => {
+    const nextManualControl = !manualControlRef.current;
+    manualControlRef.current = nextManualControl;
+    pressedKeysRef.current.clear();
+    steveMovingRef.current = !nextManualControl;
+    setIsSteveMoving(!nextManualControl);
+
+    if (!nextManualControl) {
+      steveVerticalPositionRef.current = 0;
+      mascotRef.current?.style.setProperty('--steve-y', '0px');
+    }
+
+    setIsManualControl(nextManualControl);
+  };
+
   return (
     <div
       ref={mascotRef}
-      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}`}
-      style={{ '--creeper-x': '12px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px` }}
+      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}`}
+      style={{ '--creeper-x': '12px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
     >
+      <button
+        className="character-control"
+        type="button"
+        aria-pressed={isManualControl}
+        onClick={toggleCharacterControl}
+      >
+        <span className="character-control__keys" aria-hidden="true">WASD</span>
+        <span>{isManualControl ? 'Parar de controlar personagem' : 'Controlar personagem'}</span>
+      </button>
       <nav className="mob-dock skin-dock" aria-label="Escolher skin do personagem">
         <span className="mob-dock__label" aria-hidden="true">SKINS</span>
         {SKINS.map((skin) => (

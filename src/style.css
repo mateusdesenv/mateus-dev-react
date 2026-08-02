@@ -2858,6 +2858,57 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   pointer-events: none;
 }
 
+.character-control {
+  position: fixed;
+  z-index: 4;
+  right: 50%;
+  bottom: 118px;
+  min-height: 42px;
+  padding: 7px 12px 8px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 2px solid;
+  border-color: var(--retro-border-light) var(--retro-border-dark) var(--retro-border-dark) var(--retro-border-light);
+  border-radius: 2px;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: 0 4px 0 var(--retro-shadow);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  pointer-events: auto;
+  transform: translateX(50%);
+  transition: filter 120ms ease, translate 80ms ease, box-shadow 80ms ease;
+}
+
+.character-control:hover,
+.character-control:focus-visible {
+  filter: brightness(1.06);
+}
+
+.character-control:active {
+  translate: 0 3px;
+  box-shadow: 0 1px 0 var(--retro-shadow);
+}
+
+.character-control[aria-pressed="true"] {
+  border-color: #ff9588 #6f1813 #6f1813 #ff9588;
+  color: #fff8f4;
+  background: #bd3329;
+  box-shadow: 0 4px 0 #711b16, inset 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.character-control__keys {
+  padding: 4px 5px;
+  border: 1px solid currentColor;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
 .mob-dock {
   position: fixed;
   z-index: 2;
@@ -2880,12 +2931,23 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 }
 
 .skin-dock {
+  top: calc(50% + 28px);
   right: auto;
   left: 14px;
+  padding: 6px;
+  gap: 5px;
 }
 
 .skin-dock .mob-dock__button {
+  width: 44px;
+  height: 44px;
+  padding: 5px;
   transform-origin: left center;
+}
+
+.skin-dock .mob-dock__button svg {
+  width: 29px;
+  height: 29px;
 }
 
 .skin-dock .mob-dock__button > span {
@@ -3011,8 +3073,14 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   position: absolute;
   bottom: 0;
   left: 0;
-  transform: translate3d(var(--steve-x), 0, 0);
+  transform: translate3d(var(--steve-x), var(--steve-y), 0);
   will-change: transform;
+}
+
+.creeper-mascot--manual:not(.creeper-mascot--steve-moving) .creeper-mascot__steve-sprite,
+.creeper-mascot--manual:not(.creeper-mascot--steve-moving) .creeper-mascot__steve-arm,
+.creeper-mascot--manual:not(.creeper-mascot--steve-moving) .creeper-mascot__steve-leg {
+  animation-play-state: paused;
 }
 
 .creeper-mascot__steve {
@@ -3491,6 +3559,17 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
     height: 70px;
   }
 
+  .character-control {
+    right: 50%;
+    bottom: 86px;
+    min-height: 38px;
+    max-width: calc(100vw - 136px);
+    padding: 6px 9px 7px 6px;
+    gap: 6px;
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
   .mob-dock {
     top: auto;
     right: 8px;
@@ -3502,8 +3581,21 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   }
 
   .skin-dock {
+    top: auto;
     right: auto;
     left: 8px;
+    gap: 4px;
+  }
+
+  .skin-dock .mob-dock__button {
+    width: 36px;
+    height: 36px;
+    padding: 4px;
+  }
+
+  .skin-dock .mob-dock__button svg {
+    width: 24px;
+    height: 24px;
   }
 
   .mob-dock__button {
