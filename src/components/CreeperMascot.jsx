@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const EXPLOSION_DELAY = 500;
 const EXPLOSION_RANGE = 20;
+const CURSOR_EXPLOSION_RANGE = 110;
 const CREEPER_WIDTH = 76;
 const STEVE_WIDTH = 48;
 const CREEPER_SPEED = 105;
@@ -48,7 +49,7 @@ const SKINS = [
 const SKIN_COLORS = {
   technoblade: { skin: '#ef9c91', skinLight: '#ffc0b3', hair: '#d86673', shirt: '#a71f32', shirtLight: '#d43743', shirtDark: '#681522', pants: '#26252e', boots: '#111117' },
   viniccius13: { skin: '#b96f4f', skinLight: '#df956d', hair: '#34251f', shirt: '#d46f22', shirtLight: '#f39a35', shirtDark: '#78411e', pants: '#303742', boots: '#171a20' },
-  daviGamer: { skin: '#c98560', skinLight: '#eca37b', hair: '#d4a33f', shirt: '#2865ad', shirtLight: '#4287d1', shirtDark: '#173f78', pants: '#252b4e', boots: '#15172b' },
+  daviGamer: { skin: '#9f5e3f', skinLight: '#ca825d', hair: '#32180c', shirt: '#07183a', shirtLight: '#0a4f9d', shirtDark: '#020817', pants: '#071022', boots: '#02040a' },
   authenticGames: { skin: '#bb7353', skinLight: '#df9870', hair: '#251c1a', shirt: '#bd2930', shirtLight: '#eb4547', shirtDark: '#6e1a21', pants: '#292a31', boots: '#121319' },
   leon: { skin: '#bd7959', skinLight: '#dfa07a', hair: '#4b3024', shirt: '#236f85', shirtLight: '#3693a5', shirtDark: '#174857', pants: '#39434c', boots: '#1c2228' },
   venomExtreme: { skin: '#9b6249', skinLight: '#c68462', hair: '#151819', shirt: '#1b2221', shirtLight: '#27322f', shirtDark: '#0d1211', pants: '#172321', boots: '#090d0c' },
@@ -74,6 +75,8 @@ function SkinDockIcon({ skin }) {
       {skin === 'leon' && <path fill="#34241f" d="M3 6h5v4H3zM9 6h5v4H9zM7 7h3v1H7zM5 11h7v3H5z" fillOpacity=".8" />}
       {skin === 'authenticGames' && <path fill="#fff" d="M3 13h10v2H3z" />}
       {skin === 'viniccius13' && <path fill="#f5c433" d="M2 13h12v2H2z" />}
+      {skin === 'daviGamer' && <path fill="#f4f2eb" d="M3 12h10v3H3z" />}
+      {skin === 'daviGamer' && <path fill="#0b60bc" d="M7 12h3v3H7z" />}
       {skin === 'edukof' && <path fill="#ffd83d" d="M7 3h4L9 7h3l-6 7 2-5H5z" />}
       {skin === 'feromonas' && <path fill="#b6242d" d="M2 1h12v4H2z" />}
       {skin === 'feromonas' && <path fill="#f1e9d4" d="M7 1h3v2H7zM6 2h5v1H6z" />}
@@ -115,6 +118,8 @@ function CharacterSkin({ skin }) {
             <path fill="#744331" d="M20 24h10v3H20z" />
             {skin === 'leon' && <path fill="#3e2a22" d="M12 12h12v9H12zM25 12h12v9H25zM22 15h5v2h-5zM17 23h17v8H17z" fillOpacity=".72" />}
             {skin === 'venomExtreme' && <path fill="#0b1210" d="M10 4h28v9H10zM10 9h7v20h-7zM31 9h7v20h-7z" fillOpacity=".82" />}
+            {skin === 'daviGamer' && <path fill="#1d0d07" d="M10 4h28v5H10zM13 8h6v4h-6zM29 7h9v5h-9z" />}
+            {skin === 'daviGamer' && <path fill="#55bfff" d="M19 14h3v5h-3zM27 14h3v5h-3z" />}
             {skin === 'edukof' && <path fill="#d52731" d="M10 4h28v5H10z" opacity=".45" />}
             {skin === 'edukof' && <path fill="#9b2229" d="M19 14h3v5h-3zM27 14h3v5h-3z" />}
             {skin === 'feromonas' && <path fill="#a9242d" d="M7 0h34v8H7z" />}
@@ -131,7 +136,9 @@ function CharacterSkin({ skin }) {
       <path fill={colors.shirtDark} d="M30 34h4v25h-4zM14 56h20v4H14z" />
       {skin === 'technoblade' && <path fill="#efc43b" d="M22 34h5v22h-5zM14 39h20v4H14z" />}
       {skin === 'viniccius13' && <path fill="#ffe56b" d="M20 39h9v3h-5v4h5v8h-9v-3h5v-3h-5z" />}
-      {skin === 'daviGamer' && <path fill="#eef6ff" d="M19 40h10v13H19zM22 43h4v7h-4z" />}
+      {skin === 'daviGamer' && <path fill="#f0eee7" d="M18 34h12v22H18zM14 34h6v8h-6zM28 34h6v8h-6z" />}
+      {skin === 'daviGamer' && <path fill="#0a57ac" d="M22 35h5v5h-5zM23 40h4v13h-4zM18 53h12v4H18z" />}
+      {skin === 'daviGamer' && <path fill="#020817" d="M14 42h5v17h-5zM29 42h5v17h-5z" />}
       {skin === 'authenticGames' && <path fill="#fff" d="M18 34h12v6H18zM21 42h6v13h-6z" />}
       {skin === 'leon' && <path fill="#dae9e2" d="M20 37h8v3h-8zM22 40h4v5h-4z" />}
       {skin === 'venomExtreme' && <path fill="#65d34d" d="M21 35h6v5h4v5h-4v10h-6V45h-4v-5h4z" />}
@@ -282,6 +289,7 @@ function CreeperMascot() {
   const endermanWalkStartRef = useRef(0);
   const endermanWalkFinishRef = useRef(0);
   const statusRef = useRef('walking');
+  const cursorNearCreeperRef = useRef(false);
   const skeletonShootingRef = useRef(false);
   const endermanTeleportingRef = useRef(false);
   const endermanWalkingRef = useRef(false);
@@ -326,8 +334,9 @@ function CreeperMascot() {
           : Math.max(0, currentCreeperX - steveRight);
 
         if (selectedMob === 'creeper') {
-          if (gap <= EXPLOSION_RANGE && statusRef.current === 'walking') startCharging();
-          if (gap > EXPLOSION_RANGE && statusRef.current !== 'walking') cancelExplosion();
+          const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
+          if (shouldCharge && statusRef.current === 'walking') startCharging();
+          if (!shouldCharge && statusRef.current !== 'walking') cancelExplosion();
         } else if (statusRef.current !== 'walking') {
           cancelExplosion();
         }
@@ -400,9 +409,43 @@ function CreeperMascot() {
 
     animationFrame = window.requestAnimationFrame(followSteve);
 
+    const supportsCursorInteraction = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    const handlePointerMove = (event) => {
+      if (!supportsCursorInteraction || selectedMob !== 'creeper') return;
+
+      const walker = mascotRef.current?.querySelector('.creeper-mascot__walker');
+      if (!walker) return;
+
+      const rect = walker.getBoundingClientRect();
+      const distanceX = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right);
+      const distanceY = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom);
+      const isNear = Math.hypot(distanceX, distanceY) <= CURSOR_EXPLOSION_RANGE;
+
+      if (isNear === cursorNearCreeperRef.current) return;
+      cursorNearCreeperRef.current = isNear;
+
+      if (isNear && statusRef.current === 'walking') startCharging();
+    };
+
+    const handlePointerExit = (event) => {
+      if (event?.relatedTarget) return;
+      cursorNearCreeperRef.current = false;
+    };
+
+    if (supportsCursorInteraction) {
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
+      window.addEventListener('pointerout', handlePointerExit);
+      window.addEventListener('blur', handlePointerExit);
+    }
+
     return () => {
       window.clearTimeout(explosionTimerRef.current);
       window.cancelAnimationFrame(animationFrame);
+      cursorNearCreeperRef.current = false;
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerout', handlePointerExit);
+      window.removeEventListener('blur', handlePointerExit);
     };
   }, [selectedMob]);
 
