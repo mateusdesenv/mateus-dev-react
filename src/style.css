@@ -2451,6 +2451,56 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   }
 }
 
+@keyframes enderman-eyes-pulse {
+  0%,
+  100% {
+    opacity: 0.86;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes enderman-particle-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.65);
+  }
+
+  22% {
+    opacity: 0.9;
+  }
+
+  78% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--particle-drift), -18px, 0) scale(1);
+  }
+}
+
+@keyframes enderman-teleport-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  25%,
+  65% {
+    opacity: 0.15;
+    filter: brightness(1.8) drop-shadow(0 0 8px #c72cff);
+  }
+
+  45% {
+    opacity: 0;
+    filter: brightness(2.2) drop-shadow(0 0 12px #e26cff);
+  }
+}
+
 @keyframes skeleton-arrow-flight {
   0% {
     opacity: 1;
@@ -2464,6 +2514,72 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   100% {
     opacity: 0;
     transform: translate3d(var(--arrow-travel), 0, 0);
+  }
+}
+
+@keyframes jockey-wing-front {
+  0%,
+  100% {
+    transform: rotate(-8deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(18deg) translateY(3px);
+  }
+}
+
+@keyframes jockey-wing-back {
+  0%,
+  100% {
+    transform: rotate(10deg) translateY(2px);
+  }
+
+  50% {
+    transform: rotate(-14deg) translateY(-1px);
+  }
+}
+
+@keyframes jockey-rider-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes spider-leg-a {
+  0%,
+  100% {
+    transform: rotate(8deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(-10deg) translateY(2px);
+  }
+}
+
+@keyframes spider-leg-b {
+  0%,
+  100% {
+    transform: rotate(-9deg) translateY(2px);
+  }
+
+  50% {
+    transform: rotate(9deg) translateY(0);
+  }
+}
+
+@keyframes spider-body-run {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
   }
 }
 
@@ -2625,6 +2741,43 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   pointer-events: auto;
   transform: translateY(-50%);
   backdrop-filter: blur(8px);
+}
+
+.skin-dock {
+  right: auto;
+  left: 14px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.skin-dock::-webkit-scrollbar {
+  display: none;
+}
+
+.skin-dock .mob-dock__button {
+  transform-origin: left center;
+}
+
+.skin-dock .mob-dock__button > span {
+  right: auto;
+  left: calc(100% + 12px);
+  transform: translate(-8px, -50%);
+}
+
+.skin-dock .mob-dock__button:hover,
+.skin-dock .mob-dock__button:focus-visible {
+  transform: translateX(7px) scale(1.16);
+}
+
+.skin-dock .mob-dock__button:hover > span,
+.skin-dock .mob-dock__button:focus-visible > span {
+  transform: translate(0, -50%) scale(0.86);
+}
+
+.skin-dock .mob-dock__button[aria-pressed="true"]::after {
+  right: -8px;
+  left: auto;
 }
 
 .mob-dock__label {
@@ -2806,13 +2959,34 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   filter: drop-shadow(4px 4px 0 rgba(21, 35, 22, 0.46));
 }
 
+.creeper-mascot__sprite--pigman {
+  filter: drop-shadow(4px 4px 0 rgba(43, 24, 22, 0.48));
+}
+
+.creeper-mascot__sprite--enderman {
+  filter: drop-shadow(4px 4px 0 rgba(8, 2, 12, 0.58));
+}
+
+.creeper-mascot__sprite--jockey {
+  filter: drop-shadow(4px 4px 0 rgba(36, 36, 25, 0.42));
+}
+
+.creeper-mascot__sprite--spider {
+  filter: drop-shadow(4px 4px 0 rgba(16, 12, 12, 0.5));
+}
+
+.creeper-mascot__sprite--spider-jockey {
+  filter: drop-shadow(4px 4px 0 rgba(16, 12, 12, 0.52));
+}
+
 .mob-sprite__limb {
   transform-box: fill-box;
   transform-origin: center top;
   will-change: transform;
 }
 
-.creeper-mascot--mob-zombie .mob-sprite__limb--sword-arm {
+.creeper-mascot--mob-zombie .mob-sprite__limb--sword-arm,
+.creeper-mascot--mob-pigman .mob-sprite__limb--sword-arm {
   transform-box: view-box;
   transform-origin: 9px 40px;
 }
@@ -2835,12 +3009,176 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   animation-duration: 440ms;
 }
 
+.creeper-mascot--mob-pigman .mob-sprite__limb {
+  animation-duration: 390ms;
+}
+
+.creeper-mascot--mob-enderman .mob-sprite__limb {
+  animation: none;
+}
+
+.creeper-mascot--mob-enderman .creeper-mascot__walker {
+  animation-play-state: paused;
+}
+
+.creeper-mascot--mob-enderman.creeper-mascot--enderman-walking .creeper-mascot__walker {
+  animation-play-state: running;
+}
+
+.creeper-mascot--mob-enderman.creeper-mascot--enderman-walking .mob-sprite__limb--back-leg {
+  animation: mob-limb-forward 480ms steps(2, end) infinite;
+}
+
+.creeper-mascot--mob-enderman.creeper-mascot--enderman-walking .mob-sprite__limb--front-leg {
+  animation: mob-limb-backward 480ms steps(2, end) infinite;
+}
+
+.enderman__eyes {
+  filter: drop-shadow(0 0 3px rgba(208, 67, 255, 0.95));
+  animation: enderman-eyes-pulse 900ms steps(2, end) infinite;
+}
+
+.enderman__grass-block {
+  filter: drop-shadow(2px 2px 0 rgba(3, 6, 3, 0.55));
+}
+
+.enderman-particles {
+  position: absolute;
+  z-index: 2;
+  inset: -16px -12px -5px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.enderman-particles i {
+  position: absolute;
+  bottom: var(--particle-y);
+  left: var(--particle-x);
+  width: 4px;
+  height: 4px;
+  background: #a51ee5;
+  box-shadow: 3px 0 0 #e16cff, 0 3px 0 #5b117f;
+  opacity: 0;
+  image-rendering: pixelated;
+  animation: enderman-particle-float var(--particle-duration) steps(4, end) var(--particle-delay) infinite;
+}
+
+.creeper-mascot--enderman-teleporting .creeper-mascot__sprite--enderman {
+  animation: enderman-teleport-flicker 520ms steps(4, end) both;
+}
+
+.creeper-mascot--enderman-teleporting .enderman-particles i {
+  width: 5px;
+  height: 5px;
+  box-shadow: 4px 0 0 #f09cff, 0 4px 0 #6d1599;
+  animation-duration: 360ms;
+}
+
+.creeper-mascot--mob-jockey .creeper-mascot__walker {
+  animation-duration: 280ms;
+}
+
+.creeper-mascot--mob-jockey .jockey-chicken__leg {
+  animation-duration: 260ms;
+}
+
+.jockey-chicken__wing,
+.jockey-rider,
+.jockey-rider__arm,
+.jockey-rider__leg,
+.jockey-rider__body {
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.jockey-chicken__wing {
+  transform-origin: center top;
+}
+
+.jockey-chicken__wing--front {
+  animation: jockey-wing-front 300ms steps(2, end) infinite;
+}
+
+.jockey-chicken__wing--back {
+  animation: jockey-wing-back 300ms steps(2, end) infinite;
+}
+
+.jockey-rider {
+  animation: jockey-rider-bob 280ms steps(2, end) infinite;
+}
+
+.jockey-rider__arm,
+.jockey-rider__leg {
+  transform-origin: center top;
+}
+
+.jockey-rider__arm--front {
+  animation: mob-limb-forward 320ms steps(2, end) infinite;
+}
+
+.jockey-rider__arm--back {
+  animation: mob-limb-backward 320ms steps(2, end) infinite;
+}
+
+.jockey-rider__leg {
+  animation: none;
+}
+
+.creeper-mascot--mob-spider .creeper-mascot__walker {
+  animation-duration: 320ms;
+}
+
+.spider-leg,
+.spider-body {
+  transform-box: fill-box;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.spider-leg--a {
+  animation: spider-leg-a 300ms steps(2, end) infinite;
+}
+
+.spider-leg--b {
+  animation: spider-leg-b 300ms steps(2, end) infinite;
+}
+
+.spider-body {
+  animation: spider-body-run 300ms steps(2, end) infinite;
+}
+
+.creeper-mascot--mob-spiderJockey .creeper-mascot__walker {
+  animation-duration: 300ms;
+}
+
+.creeper-mascot--mob-spiderJockey .spider-leg,
+.creeper-mascot--mob-spiderJockey .spider-body {
+  animation-duration: 280ms;
+}
+
+.spider-jockey__rider {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: jockey-rider-bob 300ms steps(2, end) infinite;
+}
+
+.spider-jockey__rider-leg {
+  animation: none;
+}
+
 .creeper-mascot--skeleton-shooting .creeper-mascot__walker {
   animation-play-state: paused;
 }
 
 .creeper-mascot--skeleton-shooting .mob-sprite__limb {
   animation: none;
+}
+
+.creeper-mascot--skeleton-shooting .spider-leg,
+.creeper-mascot--skeleton-shooting .spider-body,
+.creeper-mascot--skeleton-shooting .spider-jockey__rider {
+  animation-play-state: paused;
 }
 
 .creeper-mascot--skeleton-shooting .mob-sprite__limb--front-arm {
@@ -2874,6 +3212,10 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 
 .skeleton-arrow--left svg {
   transform: scaleX(-1);
+}
+
+.skeleton-arrow--mounted {
+  bottom: 66px;
 }
 
 .creeper-mascot--charging {
@@ -3029,6 +3371,12 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
     transform: none;
   }
 
+  .skin-dock {
+    right: auto;
+    left: 8px;
+    max-height: calc(100vh - 104px);
+  }
+
   .mob-dock__button {
     width: 40px;
     height: 40px;
@@ -3045,6 +3393,11 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
     transform: translateX(-4px) scale(1.08);
   }
 
+  .skin-dock .mob-dock__button:hover,
+  .skin-dock .mob-dock__button:focus-visible {
+    transform: translateX(4px) scale(1.08);
+  }
+
   .skeleton-arrow {
     bottom: 37px;
     transform-origin: left center;
@@ -3053,6 +3406,10 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   .skeleton-arrow svg {
     width: 32px;
     height: 10px;
+  }
+
+  .skeleton-arrow--mounted {
+    bottom: 51px;
   }
 }
 
