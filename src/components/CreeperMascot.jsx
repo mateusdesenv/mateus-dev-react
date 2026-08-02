@@ -23,6 +23,10 @@ const ENDERMAN_MIN_WALK_INTERVAL = 7000;
 const ENDERMAN_MAX_WALK_INTERVAL = 15000;
 const ENDERMAN_WALK_DURATION = 1000;
 const ENDERMAN_WALK_SPEED = 38;
+const ENDER_DRAGON_MIN_INTERVAL = 5000;
+const ENDER_DRAGON_MAX_INTERVAL = 10000;
+const ENDER_DRAGON_MIN_DURATION = 4200;
+const ENDER_DRAGON_MAX_DURATION = 5800;
 const MOBS = [
   { id: 'creeper', label: 'Creeper' },
   { id: 'skeleton', label: 'Esqueleto' },
@@ -280,6 +284,53 @@ function MobDockIcon({ mob }) {
   );
 }
 
+function EnderDragon() {
+  return (
+    <svg viewBox="0 0 192 96" role="presentation" shapeRendering="crispEdges">
+      <g className="ender-dragon__wing ender-dragon__wing--back">
+        <path fill="#100d13" d="M96 47V18H80V8H59V0H39v12h13v17H35v18z" />
+        <path fill="#392540" d="M88 42V23H76V15H59v18H48v9z" />
+        <path fill="#5a3565" d="M76 23h8v15h-8zM59 15h9v18h-9z" />
+      </g>
+      <g className="ender-dragon__wing ender-dragon__wing--front">
+        <path fill="#17121b" d="M106 47V14h16V5h24V0h17v13h-12v16h17v18z" />
+        <path fill="#432a4b" d="M114 42V20h12v-8h18v21h11v9z" />
+        <path fill="#684078" d="M122 20h8v18h-8zM136 12h8v21h-8z" />
+      </g>
+      <g className="ender-dragon__tail">
+        <path fill="#0b0a0d" d="M8 48h18v-7h19v5h21v17H43v7H23v-7H8z" />
+        <path fill="#28202d" d="M0 46h14v12H0zM21 45h18v17H21zM42 49h20v14H42z" />
+        <path fill="#8c36a7" d="M6 47h8v4H6zM28 46h8v5h-8zM48 50h9v4h-9z" />
+      </g>
+      <g className="ender-dragon__body">
+        <path fill="#0b090d" d="M57 38h85v31H57z" />
+        <path fill="#221a26" d="M65 42h69v22H65z" />
+        <path fill="#39263f" d="M75 46h48v12H75z" />
+        <path fill="#8d35a8" d="M68 61h58v5H68zM82 41h12v5H82zM110 39h10v6h-10z" />
+        <path fill="#0b090d" d="M126 30h18v34h-18z" />
+        <path fill="#211825" d="M132 32h12v27h-12z" />
+      </g>
+      <g className="ender-dragon__head">
+        <path fill="#0a090c" d="M139 25h41v34h-41zM174 34h18v25h-18z" />
+        <path fill="#251b29" d="M145 29h29v25h-29zM174 39h14v15h-14z" />
+        <path fill="#3d2945" d="M151 31h18v12h-18z" />
+        <path fill="#d848ff" d="M158 36h10v5h-10z" />
+        <path fill="#f4aeff" d="M164 36h4v3h-4z" />
+        <path fill="#100c13" d="M142 18h8v12h-8zM168 17h8v14h-8zM181 45h7v5h-7z" />
+        <path fill="#8c36a7" d="M176 52h12v4h-12z" />
+      </g>
+      <g className="ender-dragon__leg ender-dragon__leg--back">
+        <path fill="#121016" d="M108 65h13v19h-7v8h-14v-7h8z" />
+        <path fill="#3a2841" d="M111 67h7v16h-7z" />
+      </g>
+      <g className="ender-dragon__leg ender-dragon__leg--front">
+        <path fill="#0e0c11" d="M76 65h13v18h-7v9H68v-7h8z" />
+        <path fill="#432d4b" d="M79 67h7v15h-7z" />
+      </g>
+    </svg>
+  );
+}
+
 function CreeperMascot() {
   const [selectedMob, setSelectedMob] = useState('creeper');
   const [selectedSkin, setSelectedSkin] = useState('steve');
@@ -291,6 +342,7 @@ function CreeperMascot() {
   const [isSkeletonShooting, setIsSkeletonShooting] = useState(false);
   const [isEndermanTeleporting, setIsEndermanTeleporting] = useState(false);
   const [isEndermanWalking, setIsEndermanWalking] = useState(false);
+  const [enderDragonFlight, setEnderDragonFlight] = useState(null);
   const [arrowShot, setArrowShot] = useState(null);
   const mascotRef = useRef(null);
   const explosionTimerRef = useRef(0);
@@ -303,6 +355,8 @@ function CreeperMascot() {
   const endermanFinishRef = useRef(0);
   const endermanWalkStartRef = useRef(0);
   const endermanWalkFinishRef = useRef(0);
+  const enderDragonScheduleRef = useRef(0);
+  const enderDragonCleanupRef = useRef(0);
   const statusRef = useRef('walking');
   const cursorNearCreeperRef = useRef(false);
   const skeletonShootingRef = useRef(false);
@@ -315,6 +369,7 @@ function CreeperMascot() {
   const pressedKeysRef = useRef(new Set());
   const steveMovingRef = useRef(true);
   const creeperPositionRef = useRef(12);
+  const creeperVerticalPositionRef = useRef(0);
   const creeperDirectionRef = useRef(creeperDirection);
   const lastDirectionChangeRef = useRef(0);
 
@@ -345,13 +400,22 @@ function CreeperMascot() {
       if (elapsed >= 0.016) {
         lastUpdate = time;
         const steveX = stevePositionRef.current;
+        const steveY = steveVerticalPositionRef.current;
         const currentCreeperX = creeperPositionRef.current;
+        const currentCreeperY = creeperVerticalPositionRef.current;
+        const mobHeight = window.innerWidth <= 560 ? 72 : 96;
+        const steveHeight = window.innerWidth <= 560 ? 70 : 88;
         const creeperRight = currentCreeperX + CREEPER_WIDTH;
+        const creeperTop = currentCreeperY + mobHeight;
         const steveRight = steveX + STEVE_WIDTH;
+        const steveTop = steveY + steveHeight;
         const horizontalGap = currentCreeperX <= steveX
           ? Math.max(0, steveX - creeperRight)
           : Math.max(0, currentCreeperX - steveRight);
-        const gap = Math.hypot(horizontalGap, steveVerticalPositionRef.current);
+        const verticalGap = currentCreeperY <= steveY
+          ? Math.max(0, steveY - creeperTop)
+          : Math.max(0, currentCreeperY - steveTop);
+        const gap = Math.hypot(horizontalGap, verticalGap);
 
         if (selectedMob === 'creeper') {
           const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
@@ -416,47 +480,71 @@ function CreeperMascot() {
         stevePositionRef.current = nextSteveX;
 
         if (selectedMob === 'enderman' && endermanWalkingRef.current && !endermanTeleportingRef.current) {
-          const directionMultiplier = creeperDirectionRef.current === 'right' ? 1 : -1;
-          let nextEndermanX = currentCreeperX + directionMultiplier * ENDERMAN_WALK_SPEED * elapsed;
-          let nextEndermanDirection = creeperDirectionRef.current;
+          const targetX = stevePositionRef.current + (STEVE_WIDTH / 2);
+          const targetY = steveVerticalPositionRef.current + (steveHeight / 2);
+          const currentX = currentCreeperX + (CREEPER_WIDTH / 2);
+          const currentY = currentCreeperY + (mobHeight / 2);
+          const deltaX = targetX - currentX;
+          const deltaY = targetY - currentY;
+          const distance = Math.hypot(deltaX, deltaY);
+          const movement = Math.min(distance, ENDERMAN_WALK_SPEED * elapsed);
+          const maxMobY = Math.max(0, window.innerHeight - mobHeight);
 
-          if (nextEndermanX >= window.innerWidth - CREEPER_WIDTH) {
-            nextEndermanX = window.innerWidth - CREEPER_WIDTH;
-            nextEndermanDirection = 'left';
-          } else if (nextEndermanX <= 0) {
-            nextEndermanX = 0;
-            nextEndermanDirection = 'right';
+          if (distance > 0.5) {
+            const nextEndermanX = Math.max(0, Math.min(
+              window.innerWidth - CREEPER_WIDTH,
+              currentCreeperX + (deltaX / distance) * movement,
+            ));
+            const nextEndermanY = Math.max(0, Math.min(
+              maxMobY,
+              currentCreeperY + (deltaY / distance) * movement,
+            ));
+            const nextEndermanDirection = deltaX >= 0 ? 'right' : 'left';
+
+            if (nextEndermanDirection !== creeperDirectionRef.current) {
+              creeperDirectionRef.current = nextEndermanDirection;
+              setCreeperDirection(nextEndermanDirection);
+            }
+
+            creeperPositionRef.current = nextEndermanX;
+            creeperVerticalPositionRef.current = nextEndermanY;
           }
-
-          if (nextEndermanDirection !== creeperDirectionRef.current) {
-            creeperDirectionRef.current = nextEndermanDirection;
-            setCreeperDirection(nextEndermanDirection);
-          }
-
-          creeperPositionRef.current = nextEndermanX;
         } else if (selectedMob !== 'enderman' && statusRef.current === 'walking' && !skeletonShootingRef.current && !endermanTeleportingRef.current) {
-          const target = currentCreeperX <= steveX
-            ? steveX - CREEPER_WIDTH - EXPLOSION_RANGE
-            : steveX + STEVE_WIDTH + EXPLOSION_RANGE;
-          const boundedTarget = Math.max(0, Math.min(window.innerWidth - CREEPER_WIDTH, target));
-          const distance = boundedTarget - currentCreeperX;
-          const movement = Math.sign(distance) * Math.min(Math.abs(distance), CREEPER_SPEED * elapsed);
-          const nextCreeperX = currentCreeperX + movement;
+          const targetX = stevePositionRef.current + (STEVE_WIDTH / 2);
+          const targetY = steveVerticalPositionRef.current + (steveHeight / 2);
+          const currentX = currentCreeperX + (CREEPER_WIDTH / 2);
+          const currentY = currentCreeperY + (mobHeight / 2);
+          const deltaX = targetX - currentX;
+          const deltaY = targetY - currentY;
+          const distance = Math.hypot(deltaX, deltaY);
+          const movement = Math.min(distance, CREEPER_SPEED * elapsed);
+          const maxMobY = Math.max(0, window.innerHeight - mobHeight);
 
-          if (Math.abs(distance) > 0.5) {
-            const nextCreeperDirection = distance > 0 ? 'right' : 'left';
+          if (gap > EXPLOSION_RANGE && distance > 0.5) {
+            const nextCreeperX = Math.max(0, Math.min(
+              window.innerWidth - CREEPER_WIDTH,
+              currentCreeperX + (deltaX / distance) * movement,
+            ));
+            const nextCreeperY = Math.max(0, Math.min(
+              maxMobY,
+              currentCreeperY + (deltaY / distance) * movement,
+            ));
+            const nextCreeperDirection = deltaX >= 0 ? 'right' : 'left';
+
             if (nextCreeperDirection !== creeperDirectionRef.current) {
               creeperDirectionRef.current = nextCreeperDirection;
               setCreeperDirection(nextCreeperDirection);
             }
-          }
 
-          creeperPositionRef.current = nextCreeperX;
+            creeperPositionRef.current = nextCreeperX;
+            creeperVerticalPositionRef.current = nextCreeperY;
+          }
         }
 
         mascotRef.current?.style.setProperty('--steve-x', `${Math.round(stevePositionRef.current)}px`);
         mascotRef.current?.style.setProperty('--steve-y', `${Math.round(-steveVerticalPositionRef.current)}px`);
         mascotRef.current?.style.setProperty('--creeper-x', `${Math.round(creeperPositionRef.current)}px`);
+        mascotRef.current?.style.setProperty('--creeper-y', `${Math.round(-creeperVerticalPositionRef.current)}px`);
       }
 
       animationFrame = window.requestAnimationFrame(followSteve);
@@ -501,6 +589,45 @@ function CreeperMascot() {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerout', handlePointerExit);
       window.removeEventListener('blur', handlePointerExit);
+    };
+  }, [selectedMob]);
+
+  useEffect(() => {
+    window.clearTimeout(enderDragonScheduleRef.current);
+    window.clearTimeout(enderDragonCleanupRef.current);
+    setEnderDragonFlight(null);
+
+    if (selectedMob !== 'enderman' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined;
+    }
+
+    const scheduleNextFlight = () => {
+      const interval = ENDER_DRAGON_MIN_INTERVAL
+        + Math.random() * (ENDER_DRAGON_MAX_INTERVAL - ENDER_DRAGON_MIN_INTERVAL);
+
+      enderDragonScheduleRef.current = window.setTimeout(() => {
+        const duration = ENDER_DRAGON_MIN_DURATION
+          + Math.random() * (ENDER_DRAGON_MAX_DURATION - ENDER_DRAGON_MIN_DURATION);
+
+        setEnderDragonFlight({
+          id: Date.now(),
+          direction: Math.random() >= 0.5 ? 'right' : 'left',
+          duration,
+          top: 92 + Math.random() * 96,
+        });
+
+        enderDragonCleanupRef.current = window.setTimeout(() => {
+          setEnderDragonFlight(null);
+          scheduleNextFlight();
+        }, duration + 120);
+      }, interval);
+    };
+
+    scheduleNextFlight();
+
+    return () => {
+      window.clearTimeout(enderDragonScheduleRef.current);
+      window.clearTimeout(enderDragonCleanupRef.current);
     };
   }, [selectedMob]);
 
@@ -556,7 +683,8 @@ function CreeperMascot() {
         return;
       }
 
-      const nextDirection = Math.random() >= 0.5 ? 'right' : 'left';
+      const nextDirection = stevePositionRef.current + (STEVE_WIDTH / 2)
+        >= creeperPositionRef.current + (CREEPER_WIDTH / 2) ? 'right' : 'left';
       creeperDirectionRef.current = nextDirection;
       setCreeperDirection(nextDirection);
       endermanWalkingRef.current = true;
@@ -593,15 +721,20 @@ function CreeperMascot() {
 
         endermanMoveRef.current = window.setTimeout(() => {
           const maxX = Math.max(0, window.innerWidth - CREEPER_WIDTH);
+          const mobHeight = window.innerWidth <= 560 ? 72 : 96;
+          const maxY = Math.max(0, window.innerHeight - mobHeight);
           const currentX = creeperPositionRef.current;
           let nextX = Math.random() * maxX;
+          const nextY = Math.random() * maxY;
 
           if (maxX > 320 && Math.abs(nextX - currentX) < 160) {
             nextX = (nextX + (maxX / 2)) % maxX;
           }
 
           creeperPositionRef.current = nextX;
+          creeperVerticalPositionRef.current = nextY;
           mascotRef.current?.style.setProperty('--creeper-x', `${Math.round(nextX)}px`);
+          mascotRef.current?.style.setProperty('--creeper-y', `${Math.round(-nextY)}px`);
 
           const nextDirection = stevePositionRef.current + (STEVE_WIDTH / 2)
             >= nextX + (CREEPER_WIDTH / 2) ? 'right' : 'left';
@@ -662,11 +795,19 @@ function CreeperMascot() {
 
         skeletonAimRef.current = window.setTimeout(() => {
           const skeletonX = creeperPositionRef.current;
+          const skeletonY = creeperVerticalPositionRef.current;
           const steveCenter = stevePositionRef.current + (STEVE_WIDTH / 2);
+          const steveCenterY = steveVerticalPositionRef.current + (window.innerWidth <= 560 ? 35 : 44);
           const direction = steveCenter >= skeletonX + (CREEPER_WIDTH / 2) ? 'right' : 'left';
           const startX = skeletonX + (direction === 'right' ? 54 : 10);
           const travel = steveCenter - startX;
-          const duration = Math.max(280, Math.min(850, Math.abs(travel) * 0.82));
+          const mounted = selectedMob === 'spiderJockey';
+          const arrowBaseHeight = window.innerWidth <= 560
+            ? (mounted ? 51 : 37)
+            : (mounted ? 66 : 49);
+          const startY = skeletonY + arrowBaseHeight;
+          const travelY = startY - steveCenterY;
+          const duration = Math.max(280, Math.min(850, Math.hypot(travel, travelY) * 0.82));
 
           if (direction !== creeperDirectionRef.current) {
             creeperDirectionRef.current = direction;
@@ -676,10 +817,12 @@ function CreeperMascot() {
           setArrowShot({
             id: Date.now(),
             startX,
+            startY,
             travel,
+            travelY,
             duration,
             direction,
-            mounted: selectedMob === 'spiderJockey',
+            mounted,
           });
           arrowCleanupRef.current = window.setTimeout(() => setArrowShot(null), duration + 80);
         }, SKELETON_AIM_TIME);
@@ -714,6 +857,8 @@ function CreeperMascot() {
     window.clearTimeout(endermanFinishRef.current);
     window.clearTimeout(endermanWalkStartRef.current);
     window.clearTimeout(endermanWalkFinishRef.current);
+    window.clearTimeout(enderDragonScheduleRef.current);
+    window.clearTimeout(enderDragonCleanupRef.current);
     skeletonShootingRef.current = false;
     endermanTeleportingRef.current = false;
     endermanWalkingRef.current = false;
@@ -722,6 +867,7 @@ function CreeperMascot() {
     setIsSkeletonShooting(false);
     setIsEndermanTeleporting(false);
     setIsEndermanWalking(false);
+    setEnderDragonFlight(null);
     setArrowShot(null);
     setSelectedMob(mob);
   };
@@ -745,8 +891,24 @@ function CreeperMascot() {
     <div
       ref={mascotRef}
       className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}`}
-      style={{ '--creeper-x': '12px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
+      style={{ '--creeper-x': '12px', '--creeper-y': '0px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
     >
+      {enderDragonFlight && (
+        <span
+          className={`ender-dragon-flight ender-dragon-flight--${enderDragonFlight.direction}`}
+          key={enderDragonFlight.id}
+          style={{
+            '--ender-dragon-duration': `${Math.round(enderDragonFlight.duration)}ms`,
+            '--ender-dragon-top': `${Math.round(enderDragonFlight.top)}px`,
+            '--ender-dragon-facing': enderDragonFlight.direction === 'right' ? 1 : -1,
+          }}
+          aria-hidden="true"
+        >
+          <span className="ender-dragon-flight__dragon">
+            <EnderDragon />
+          </span>
+        </span>
+      )}
       <button
         className="character-control"
         type="button"
@@ -1158,7 +1320,9 @@ function CreeperMascot() {
           className={`skeleton-arrow skeleton-arrow--${arrowShot.direction}${arrowShot.mounted ? ' skeleton-arrow--mounted' : ''}`}
           style={{
             '--arrow-start-x': `${Math.round(arrowShot.startX)}px`,
+            '--arrow-start-y': `${Math.round(arrowShot.startY)}px`,
             '--arrow-travel': `${Math.round(arrowShot.travel)}px`,
+            '--arrow-travel-y': `${Math.round(arrowShot.travelY)}px`,
             '--arrow-duration': `${Math.round(arrowShot.duration)}ms`,
           }}
           aria-hidden="true"

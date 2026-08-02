@@ -2637,6 +2637,154 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   }
 }
 
+@keyframes ender-dragon-flight-right {
+  0% {
+    opacity: 0;
+    transform: translate3d(-240px, 0, 0);
+  }
+
+  6%,
+  94% {
+    opacity: 1;
+  }
+
+  35% {
+    transform: translate3d(32vw, 12px, 0);
+  }
+
+  68% {
+    transform: translate3d(67vw, -8px, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(100vw + 240px), 5px, 0);
+  }
+}
+
+@keyframes ender-dragon-flight-left {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(100vw + 240px), 0, 0);
+  }
+
+  6%,
+  94% {
+    opacity: 1;
+  }
+
+  35% {
+    transform: translate3d(67vw, -8px, 0);
+  }
+
+  68% {
+    transform: translate3d(32vw, 12px, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(-240px, 5px, 0);
+  }
+}
+
+@keyframes ender-dragon-wing-front {
+  0%,
+  100% {
+    transform: rotate(-7deg) scaleY(1);
+  }
+
+  50% {
+    transform: rotate(16deg) scaleY(0.28);
+  }
+}
+
+@keyframes ender-dragon-wing-back {
+  0%,
+  100% {
+    transform: rotate(6deg) scaleY(0.88);
+  }
+
+  50% {
+    transform: rotate(-13deg) scaleY(0.22);
+  }
+}
+
+@keyframes ender-dragon-leg-sway {
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(-9deg);
+  }
+}
+
+.ender-dragon-flight {
+  position: fixed;
+  z-index: 1;
+  top: var(--ender-dragon-top);
+  left: 0;
+  width: clamp(154px, 16vw, 218px);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.ender-dragon-flight--right {
+  animation: ender-dragon-flight-right var(--ender-dragon-duration) linear forwards;
+}
+
+.ender-dragon-flight--left {
+  animation: ender-dragon-flight-left var(--ender-dragon-duration) linear forwards;
+}
+
+.ender-dragon-flight__dragon {
+  display: block;
+  filter: drop-shadow(5px 6px 0 rgba(9, 3, 12, 0.42));
+  transform: scaleX(var(--ender-dragon-facing));
+  transform-origin: center;
+}
+
+.ender-dragon-flight svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+.ender-dragon__wing,
+.ender-dragon__leg {
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.ender-dragon__wing {
+  transform-origin: center bottom;
+  animation-duration: 360ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: infinite;
+}
+
+.ender-dragon__wing--front {
+  animation-name: ender-dragon-wing-front;
+}
+
+.ender-dragon__wing--back {
+  animation-name: ender-dragon-wing-back;
+  animation-delay: -90ms;
+}
+
+.ender-dragon__leg {
+  transform-origin: center top;
+  animation: ender-dragon-leg-sway 620ms steps(2, end) infinite;
+}
+
+.ender-dragon__leg--back {
+  animation-delay: -310ms;
+}
+
 @keyframes skeleton-arrow-flight {
   0% {
     opacity: 1;
@@ -2649,7 +2797,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--arrow-travel), 0, 0);
+    transform: translate3d(var(--arrow-travel), var(--arrow-travel-y, 0), 0);
   }
 }
 
@@ -3067,7 +3215,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   bottom: 0;
   left: 0;
   width: 76px;
-  translate: var(--creeper-x) 0;
+  translate: var(--creeper-x) var(--creeper-y);
   animation: creeper-step 420ms steps(2, end) infinite;
   transform-origin: center bottom;
   will-change: translate;
@@ -3394,7 +3542,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 .skeleton-arrow {
   position: absolute;
   z-index: 3;
-  bottom: 49px;
+  bottom: var(--arrow-start-y, 49px);
   left: var(--arrow-start-x);
   width: 40px;
   height: 12px;
@@ -3417,7 +3565,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 }
 
 .skeleton-arrow--mounted {
-  bottom: 66px;
+  bottom: var(--arrow-start-y, 66px);
 }
 
 .creeper-mascot--charging {
@@ -3574,6 +3722,10 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
     line-height: 1.2;
   }
 
+  .ender-dragon-flight {
+    width: 136px;
+  }
+
   .mob-dock {
     top: auto;
     right: 8px;
@@ -3624,7 +3776,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   }
 
   .skeleton-arrow {
-    bottom: 37px;
+    bottom: var(--arrow-start-y, 37px);
     transform-origin: left center;
   }
 
@@ -3634,12 +3786,16 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   }
 
   .skeleton-arrow--mounted {
-    bottom: 51px;
+    bottom: var(--arrow-start-y, 51px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .creeper-mascot {
+    display: none;
+  }
+
+  .ender-dragon-flight {
     display: none;
   }
 }
