@@ -3488,6 +3488,29 @@ html[data-theme="end"] body {
   text-shadow: 2px 2px 0 #0a5868;
 }
 
+.diamond-counter__threats {
+  margin-left: 3px;
+  padding: 4px 6px;
+  border-left: 1px solid rgba(135, 255, 255, 0.35);
+  color: #ffcf6b;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 .minecraft-diamond {
   position: fixed;
   z-index: 3;
@@ -3652,7 +3675,7 @@ html[data-theme="end"] body {
   z-index: 1;
   background: var(--surface);
   filter: brightness(1.06);
-  transform: translateX(-7px) scale(1.16);
+  transform: scale(1.12);
 }
 
 .mob-dock__button:hover > span,
@@ -3677,6 +3700,166 @@ html[data-theme="end"] body {
   background: var(--accent-strong);
   box-shadow: 1px 1px 0 var(--retro-green-dark);
   transform: translateY(-50%);
+}
+
+@keyframes bonus-mob-step {
+  0%,
+  100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+
+@keyframes bonus-mob-charge {
+  0%,
+  100% { filter: brightness(1) saturate(1); transform: scale(1); }
+  50% { filter: brightness(2.4) saturate(0); transform: scale(1.08); }
+}
+
+@keyframes bonus-mob-attack {
+  0%,
+  100% { transform: translateX(0) rotate(0); }
+  55% { transform: translateX(12px) rotate(7deg); }
+}
+
+@keyframes bonus-sword-strike {
+  0%,
+  100% { transform: rotate(-22deg); }
+  55% { transform: rotate(58deg); }
+}
+
+@keyframes bonus-slime-attack {
+  0%,
+  100% { transform: translateY(0) scale(1.08, 0.86); }
+  48% { transform: translateY(-18px) scale(0.88, 1.18); }
+}
+
+.bonus-mob {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 0;
+  width: 56px;
+  height: 72px;
+  pointer-events: none;
+  transform: translate3d(var(--bonus-mob-x), var(--bonus-mob-y), 0);
+  will-change: transform;
+}
+
+.bonus-mob__sprite {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 56px;
+  height: 72px;
+  filter: drop-shadow(3px 3px 0 rgba(6, 12, 8, 0.46));
+  transform-origin: center bottom;
+  animation: bonus-mob-step 360ms steps(2, end) infinite;
+}
+
+.bonus-mob__sprite svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+.bonus-mob--facing-left .bonus-mob__sprite {
+  scale: -1 1;
+}
+
+.bonus-mob__shadow {
+  position: absolute;
+  right: 7px;
+  bottom: -2px;
+  left: 7px;
+  height: 6px;
+  background: rgba(5, 12, 8, 0.35);
+  filter: blur(1px);
+}
+
+.bonus-mob--spider,
+.bonus-mob--spiderJockey {
+  width: 66px;
+}
+
+.bonus-mob--spider .bonus-mob__sprite,
+.bonus-mob--spiderJockey .bonus-mob__sprite {
+  width: 66px;
+}
+
+.bonus-mob--slime .bonus-mob__sprite {
+  animation: slime-hop 760ms steps(2, end) infinite;
+}
+
+.bonus-mob--charging .bonus-mob__sprite {
+  animation: bonus-mob-charge 150ms steps(2, end) infinite;
+}
+
+.bonus-mob--attacking .bonus-mob__sprite {
+  animation: bonus-mob-attack 260ms steps(3, end) both;
+}
+
+.bonus-mob--attacking.bonus-mob--slime .bonus-mob__sprite {
+  animation: bonus-slime-attack 220ms steps(3, end) both;
+}
+
+.bonus-mob--attacking .bonus-mob__sword-arm {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: bonus-sword-strike 260ms steps(3, end) both;
+}
+
+.bonus-mob--aiming .bonus-mob__sprite,
+.bonus-mob--recovering .bonus-mob__sprite {
+  animation-play-state: paused;
+}
+
+.bonus-mob__fuse {
+  position: absolute;
+  z-index: 3;
+  top: -16px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: #231d13;
+  background: #fff4b4;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+  font: 900 14px/1 ui-monospace, monospace;
+  transform: translateX(-50%);
+}
+
+.bonus-arrow {
+  position: absolute;
+  z-index: 4;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 12px;
+  pointer-events: none;
+  transform: translate3d(var(--bonus-arrow-x), var(--bonus-arrow-y), 0) rotate(var(--bonus-arrow-angle));
+  transform-origin: left center;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.42));
+  will-change: transform;
+}
+
+.bonus-arrow svg {
+  display: block;
+  width: 40px;
+  height: 12px;
+}
+
+.creeper-mascot--main-attacking .creeper-mascot__walker {
+  animation: bonus-mob-attack 280ms steps(3, end) both;
+}
+
+.creeper-mascot--main-attacking .mob-sprite__limb--sword-arm {
+  animation: bonus-sword-strike 300ms steps(3, end) both !important;
+}
+
+.creeper-mascot--main-attacking.creeper-mascot--mob-slime .creeper-mascot__sprite--slime {
+  animation: bonus-slime-attack 220ms steps(3, end) both;
 }
 
 .creeper-mascot__walker {
@@ -4236,6 +4419,11 @@ html[data-theme="end"] body {
   animation-play-state: paused;
 }
 
+.creeper-mascot--exploded .bonus-mob__sprite,
+.creeper-mascot--exploded .bonus-arrow {
+  animation-play-state: paused;
+}
+
 .creeper-mascot--exploded .creeper-mascot__steve {
   animation: none;
 }
@@ -4371,6 +4559,23 @@ html[data-theme="end"] body {
 
   .diamond-counter strong {
     font-size: 16px;
+  }
+
+  .diamond-counter__threats {
+    padding-inline: 4px;
+    font-size: 7px;
+  }
+
+  .bonus-mob {
+    width: 44px;
+    height: 58px;
+    transform: translate3d(var(--bonus-mob-x), var(--bonus-mob-y), 0) scale(0.8);
+    transform-origin: left bottom;
+  }
+
+  .bonus-arrow {
+    transform: translate3d(var(--bonus-arrow-x), var(--bonus-arrow-y), 0) rotate(var(--bonus-arrow-angle)) scale(0.82);
+    transform-origin: left center;
   }
 
   .ender-dragon-flight {

@@ -32,6 +32,29 @@ const ENDER_DRAGON_MIN_INTERVAL = 5000;
 const ENDER_DRAGON_MAX_INTERVAL = 10000;
 const ENDER_DRAGON_MIN_DURATION = 4200;
 const ENDER_DRAGON_MAX_DURATION = 5800;
+const BONUS_MOB_INTERVAL = 5;
+const BONUS_MOB_WIDTH = 56;
+const BONUS_MOB_HEIGHT = 72;
+const BONUS_ARROW_SPEED = 430;
+const HOSTILE_MOBS = ['creeper', 'skeleton', 'zombie', 'jockey', 'spider', 'spiderJockey', 'slime'];
+const PASSIVE_MOBS = new Set(['pigman', 'enderman']);
+const RANGED_MOBS = new Set(['skeleton', 'spiderJockey']);
+const MELEE_MOBS = new Set(['zombie', 'jockey', 'spider', 'slime']);
+const MOB_ATTACK_DELAY = {
+  zombie: 320,
+  jockey: 260,
+  spider: 180,
+  slime: 220,
+};
+const MOB_SPEED = {
+  creeper: 88,
+  skeleton: 74,
+  zombie: 82,
+  jockey: 106,
+  spider: 118,
+  spiderJockey: 92,
+  slime: 78,
+};
 const MOBS = [
   { id: 'creeper', label: 'Creeper' },
   { id: 'skeleton', label: 'Esqueleto' },
@@ -48,29 +71,40 @@ const SKINS = [
   { id: 'steve', label: 'Steve' },
   { id: 'technoblade', label: 'Technoblade' },
   { id: 'viniccius13', label: 'Viniccius 13' },
-  { id: 'daviGamer', label: 'Davi Gamer' },
-  { id: 'authenticGames', label: 'Authentic Games' },
-  { id: 'leon', label: 'Leon · Coisa de Nerd' },
-  { id: 'venomExtreme', label: 'Venom Extreme' },
-  { id: 'edukof', label: 'EduKof' },
-  { id: 'feromonas', label: 'Feromonas' },
   { id: 'monark', label: 'Monark' },
-  { id: 'afreim', label: 'Afreim' },
+  { id: 'feromonas', label: 'Feromonas' },
+  { id: 'daviGamer', label: 'Davi Gamer' },
 ];
 
 const SKIN_COLORS = {
   steve: { skin: '#b96f50', skinLight: '#d9966b', hair: '#39251d', shirt: '#188f91', shirtLight: '#35b8b1', shirtDark: '#0c6269', pants: '#263b9b', boots: '#151c4b' },
   technoblade: { skin: '#ef9c91', skinLight: '#ffc0b3', hair: '#d86673', shirt: '#a71f32', shirtLight: '#d43743', shirtDark: '#681522', pants: '#26252e', boots: '#111117' },
   viniccius13: { skin: '#d19a68', skinLight: '#edb77d', hair: '#111213', shirt: '#d90d15', shirtLight: '#f21a20', shirtDark: '#7d080d', pants: '#11131d', boots: '#49171b' },
-  daviGamer: { skin: '#9f5e3f', skinLight: '#ca825d', hair: '#32180c', shirt: '#07183a', shirtLight: '#0a4f9d', shirtDark: '#020817', pants: '#071022', boots: '#02040a' },
-  authenticGames: { skin: '#bb7353', skinLight: '#df9870', hair: '#251c1a', shirt: '#bd2930', shirtLight: '#eb4547', shirtDark: '#6e1a21', pants: '#292a31', boots: '#121319' },
-  leon: { skin: '#bd7959', skinLight: '#dfa07a', hair: '#4b3024', shirt: '#236f85', shirtLight: '#3693a5', shirtDark: '#174857', pants: '#39434c', boots: '#1c2228' },
-  venomExtreme: { skin: '#9b6249', skinLight: '#c68462', hair: '#151819', shirt: '#1b2221', shirtLight: '#27322f', shirtDark: '#0d1211', pants: '#172321', boots: '#090d0c' },
-  edukof: { skin: '#b96f50', skinLight: '#e29a70', hair: '#211b1b', shirt: '#bd232b', shirtLight: '#ed3e43', shirtDark: '#71171d', pants: '#292638', boots: '#13121a' },
-  feromonas: { skin: '#a8674c', skinLight: '#d48c65', hair: '#2a2020', shirt: '#20232b', shirtLight: '#343a46', shirtDark: '#101218', pants: '#24242b', boots: '#111116' },
-  monark: { skin: '#b97755', skinLight: '#dc9870', hair: '#3d2b22', shirt: '#426f38', shirtLight: '#61964f', shirtDark: '#284722', pants: '#30343a', boots: '#171a1d' },
-  afreim: { skin: '#ae6d50', skinLight: '#d99169', hair: '#35231f', shirt: '#653c91', shirtLight: '#8c59bd', shirtDark: '#3e285e', pants: '#282c45', boots: '#131626' },
+  monark: { skin: '#dc8d5e', skinLight: '#f1a875', hair: '#092414', shirt: '#0d0e0f', shirtLight: '#1a1b1c', shirtDark: '#050606', pants: '#08090a', boots: '#020303' },
+  feromonas: { skin: '#d08b60', skinLight: '#e9a371', hair: '#101011', shirt: '#111015', shirtLight: '#242126', shirtDark: '#08070a', pants: '#32150f', boots: '#09090b' },
+  daviGamer: { skin: '#e5a77d', skinLight: '#f4c099', hair: '#783914', shirt: '#f1f2f0', shirtLight: '#ffffff', shirtDark: '#151619', pants: '#111217', boots: '#292b31' },
 };
+
+const DEATH_MESSAGES = {
+  creeper: 'Você foi explodido por um Creeper',
+  skeleton: 'Você foi atingido por uma flecha de Esqueleto',
+  spiderJockey: 'Você foi atingido por uma flecha de Spider Jockey',
+  zombie: 'Você levou uma espadada de Zumbi',
+  jockey: 'Você foi atacado por um Baby Zumbi',
+  spider: 'Você foi atacado por uma Aranha',
+  slime: 'Você foi esmagado por um Slime',
+};
+
+function getEntityGap(mobX, mobY, mobWidth, mobHeight, steveX, steveY, steveHeight) {
+  const horizontalGap = mobX <= steveX
+    ? Math.max(0, steveX - (mobX + mobWidth))
+    : Math.max(0, mobX - (steveX + STEVE_WIDTH));
+  const verticalGap = mobY <= steveY
+    ? Math.max(0, steveY - (mobY + mobHeight))
+    : Math.max(0, mobY - (steveY + steveHeight));
+
+  return Math.hypot(horizontalGap, verticalGap);
+}
 
 function createRandomDiamond(steveX, steveY) {
   const sidePadding = window.innerWidth <= 560 ? 56 : 88;
@@ -123,33 +157,183 @@ function SkinDockIcon({ skin }) {
   const colors = SKIN_COLORS[skin];
   const isTechno = skin === 'technoblade';
 
+  if (skin === 'monark') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
+        <path fill="#0a2012" d="M2 1h12v6H2z" />
+        <path fill="#12371f" d="M1 2h11v3H1zM2 5h3v5H2z" />
+        <path fill="#e39765" d="M4 5h10v8H4z" />
+        <path fill="#f2ad79" d="M6 6h8v5H6z" />
+        <path fill="#151515" d="M7 7h2v2H7zM12 7h2v2h-2z" />
+        <path fill="#090a0b" d="M2 12h12v4H2z" />
+        <path fill="#b18d42" d="M6 12h5v3H6z" />
+        <path fill="#e3ddbd" d="M7 13h3v2H7z" />
+      </svg>
+    );
+  }
+
+  if (skin === 'feromonas') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
+        <path fill="#771d1d" d="M2 1h12v5H2z" />
+        <path fill="#f0e2c6" d="M3 2h3v2H3zM10 1h3v3h-3zM7 3h2v2H7z" />
+        <path fill="#111012" d="M2 5h12v5H2z" />
+        <path fill="#df996b" d="M8 5h6v7H8z" />
+        <path fill="#101013" d="M10 7h2v2h-2zM2 11h12v5H2z" />
+        <path fill="#9a8a47" d="M5 12h2v4H5zM9 12h2v4H9z" />
+        <path fill="#e9e5d3" d="M7 11h3v2H7z" />
+        <path fill="#dc1f29" d="M2 12h2v3H2zM12 12h2v3h-2z" />
+      </svg>
+    );
+  }
+
+  if (skin === 'daviGamer') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
+        <path fill="#713713" d="M2 1h12v6H2z" />
+        <path fill="#a95622" d="M3 1h8v3H3zM2 4h4v4H2z" />
+        <path fill="#efb98f" d="M5 5h9v7H5z" />
+        <path fill="#101115" d="M7 7h2v2H7zM12 7h2v2h-2z" />
+        <path fill="#ffffff" d="M8 10h5v2H8zM5 12h7v4H5z" />
+        <path fill="#e3382f" d="M10 10h3v2h-3z" />
+        <path fill="#15161a" d="M2 11h4v5H2zM12 11h2v5h-2z" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
       <path fill={isTechno ? '#ef9c91' : colors.hair} d="M2 1h12v14H2z" />
       <path fill={colors.skinLight} d="M3 4h10v9H3z" />
       {!isTechno && <path fill={colors.hair} d="M3 2h10v4H3zM3 5h2v4H3zM11 5h2v4h-2z" />}
       {isTechno && <path fill="#efc43b" d="M2 0h3v3h3V0h3v3h3V0h1v5H2z" />}
-      <path fill={skin === 'venomExtreme' ? '#71d64f' : '#f5f2e9'} d="M4 7h3v2H4zM10 7h3v2h-3z" />
-      <path fill={skin === 'venomExtreme' ? '#07100a' : '#2f5363'} d="M6 7h1v2H6zM10 7h1v2h-1z" />
+      <path fill="#f5f2e9" d="M4 7h3v2H4zM10 7h3v2h-3z" />
+      <path fill="#2f5363" d="M6 7h1v2H6zM10 7h1v2h-1z" />
       {isTechno && <path fill="#9d4e51" d="M6 10h5v3H6zM5 11h1v2H5zM11 11h1v2h-1z" />}
       {skin === 'steve' && <path fill="#5a3629" d="M3 9h2v4h2v2h5v-2h2V9h-2v2h-2v2H7v-2H5V9z" />}
-      {skin === 'leon' && <path fill="#34241f" d="M3 6h5v4H3zM9 6h5v4H9zM7 7h3v1H7zM5 11h7v3H5z" fillOpacity=".8" />}
-      {skin === 'authenticGames' && <path fill="#fff" d="M3 13h10v2H3z" />}
       {skin === 'viniccius13' && <path fill="#f5f3eb" d="M5 9h7v4H5z" />}
       {skin === 'viniccius13' && <path fill="#111217" d="M2 4h2v8H2zM13 4h2v8h-2zM12 10h4v2h-4zM7 13h4v2H7z" />}
       {skin === 'viniccius13' && <path fill="#e7131b" d="M2 13h12v2H2z" />}
-      {skin === 'daviGamer' && <path fill="#f4f2eb" d="M3 12h10v3H3z" />}
-      {skin === 'daviGamer' && <path fill="#0b60bc" d="M7 12h3v3H7z" />}
-      {skin === 'edukof' && <path fill="#ffd83d" d="M7 3h4L9 7h3l-6 7 2-5H5z" />}
-      {skin === 'feromonas' && <path fill="#b6242d" d="M2 1h12v4H2z" />}
-      {skin === 'feromonas' && <path fill="#f1e9d4" d="M7 1h3v2H7zM6 2h5v1H6z" />}
-      {skin === 'monark' && <path fill="#4d3228" d="M5 10h7v4H5z" />}
-      {skin === 'afreim' && <path fill="#9f65d0" d="M2 12h12v3H2z" />}
+    </svg>
+  );
+}
+
+function ReferenceCharacterSkin({ skin }) {
+  const colors = SKIN_COLORS[skin];
+  const isMonark = skin === 'monark';
+  const isFeromonas = skin === 'feromonas';
+
+  return (
+    <svg className="creeper-mascot__steve-sprite" data-skin={skin} viewBox="0 0 48 88" role="presentation" shapeRendering="crispEdges">
+      <g className="creeper-mascot__steve-head">
+        {isMonark && (
+          <>
+            <path fill="#081d10" d="M7 1h34v14H7z" />
+            <path fill="#0c2b17" d="M5 4h31v11H5zM7 12h7v15H7z" />
+            <path fill="#174a29" d="M10 12h8v15h-8z" />
+            <path fill={colors.skin} d="M14 12h27v20H14z" />
+            <path fill={colors.skinLight} d="M20 14h21v14H20z" />
+            <path fill="#f3b07c" d="M20 14h6v9h-6z" />
+            <path fill="#121313" d="M26 15h6v6h-6zM37 14h4v7h-4z" />
+            <path fill="#e59a69" d="M28 23h12v5H28z" />
+            <path fill="#c97850" d="M14 27h10v5H14z" />
+          </>
+        )}
+        {isFeromonas && (
+          <>
+            <path fill="#6f1719" d="M7 0h34v11H7z" />
+            <path fill="#922322" d="M9 2h30v8H9z" />
+            <path fill="#f1e3c8" d="M10 2h6v5h-6zM30 1h8v6h-8zM21 5h6v5h-6z" />
+            <path fill="#8a1f1e" d="M13 3h3v3h-3zM33 2h3v4h-3zM23 6h3v3h-3z" />
+            <path fill="#101012" d="M7 10h34v18H7z" />
+            <path fill={colors.skin} d="M20 11h21v21H20z" />
+            <path fill={colors.skinLight} d="M25 13h16v15H25z" />
+            <path fill="#111114" d="M31 15h6v6h-6zM18 11h8v18h-8z" />
+            <path fill="#66311f" d="M30 25h11v7H30z" />
+            <path fill="#0b0b0d" d="M36 25h5v7h-5z" />
+          </>
+        )}
+        {!isMonark && !isFeromonas && (
+          <>
+            <path fill="#783914" d="M7 0h34v17H7z" />
+            <path fill="#a95422" d="M10 1h25v8H10zM7 7h12v14H7z" />
+            <path fill="#c36a31" d="M13 2h15v5H13z" />
+            <path fill={colors.skin} d="M14 10h27v22H14z" />
+            <path fill={colors.skinLight} d="M19 12h22v17H19z" />
+            <path fill="#f8f5ec" d="M20 15h7v5h-7zM33 15h7v5h-7z" />
+            <path fill="#111216" d="M24 15h3v5h-3zM33 15h3v5h-3z" />
+            <path fill="#151518" d="M27 22h12v8H27z" />
+            <path fill="#f4f2e9" d="M28 22h7v3h-7z" />
+            <path fill="#e52f2b" d="M31 25h8v5h-8z" />
+          </>
+        )}
+      </g>
+
+      <path fill={colors.shirtDark} d="M11 33h26v28H11z" />
+      <path fill={colors.shirt} d="M14 34h20v25H14z" />
+
+      {isMonark && (
+        <>
+          <path fill="#171819" d="M14 34h20v25H14z" />
+          <path fill="#b38b3c" d="M19 38h12v5H19zM17 44h16v8H17z" />
+          <path fill="#d8d1ae" d="M19 45h5v6h-5zM27 45h5v6h-5z" />
+          <path fill="#2c2720" d="M23 44h6v8h-6z" />
+          <path fill="#a79661" d="M20 52h11v5H20z" />
+        </>
+      )}
+
+      {isFeromonas && (
+        <>
+          <path fill="#151419" d="M14 34h20v26H14z" />
+          <path fill="#eee9dc" d="M20 34h9v8h-9zM22 41h6v5h-6z" />
+          <path fill="#93843b" d="M16 35h4v23h-4zM29 35h4v23h-4zM20 38h9v3h-9zM20 47h9v3h-9zM20 55h9v3h-9z" />
+          <path fill="#333025" d="M23 42h4v4h-4zM23 51h4v4h-4z" />
+          <path fill="#5b2117" d="M14 57h20v4H14z" />
+        </>
+      )}
+
+      {!isMonark && !isFeromonas && (
+        <>
+          <path fill="#15161a" d="M11 33h10v28H11zM29 33h9v28h-9z" />
+          <path fill="#f4f5f2" d="M20 34h10v25H20z" />
+          <path fill="#d7d9d8" d="M20 34h4v25h-4z" />
+          <path fill="#313339" d="M18 55h14v6H18z" />
+        </>
+      )}
+
+      <g className="creeper-mascot__steve-arm creeper-mascot__steve-arm--back">
+        <path fill={colors.shirtDark} d="M35 35h10v29H35z" />
+        <path fill={isFeromonas ? '#19171c' : '#111214'} d="M35 36h8v17H35z" />
+        {isFeromonas && <path fill="#e3222b" d="M39 43h5v8h-5z" />}
+        <path fill={colors.skin} d="M35 53h10v12H35z" />
+      </g>
+      <g className="creeper-mascot__steve-arm creeper-mascot__steve-arm--front">
+        <path fill={colors.shirtDark} d="M3 35h10v29H3z" />
+        <path fill={isFeromonas ? '#242126' : '#191a1c'} d="M6 36h7v17H6z" />
+        {isFeromonas && <path fill="#e3222b" d="M3 43h5v8H3z" />}
+        <path fill={colors.skinLight} d="M3 53h10v12H3z" />
+      </g>
+      <g className="creeper-mascot__steve-leg creeper-mascot__steve-leg--back">
+        <path fill={colors.pants} d="M25 59h12v25H25z" />
+        {isFeromonas && <path fill="#541d14" d="M25 59h12v9H25z" />}
+        <path fill={colors.boots} d="M25 81h12v7H25z" />
+        {!isMonark && <path fill="#494b50" d="M29 82h8v3h-8z" />}
+      </g>
+      <g className="creeper-mascot__steve-leg creeper-mascot__steve-leg--front">
+        <path fill={colors.pants} d="M11 59h12v25H11z" />
+        {isFeromonas && <path fill="#3e1712" d="M11 59h12v9H11z" />}
+        <path fill={colors.boots} d="M11 81h12v7H11z" />
+        {!isMonark && <path fill="#62646a" d="M11 82h8v3h-8z" />}
+      </g>
     </svg>
   );
 }
 
 function CharacterSkin({ skin }) {
+  if (skin === 'monark' || skin === 'feromonas' || skin === 'daviGamer') {
+    return <ReferenceCharacterSkin skin={skin} />;
+  }
+
   const colors = SKIN_COLORS[skin] || SKIN_COLORS.technoblade;
   const isTechno = skin === 'technoblade';
 
@@ -177,7 +361,7 @@ function CharacterSkin({ skin }) {
             <path fill={colors.skinLight} d="M13 8h22v19H13z" />
             <path fill={colors.hair} d="M10 4h28v7H10zM10 10h4v11h-4zM34 10h4v11h-4z" />
             <path fill="#f8f4eb" d="M14 14h8v5h-8zM27 14h7v5h-7z" />
-            <path fill={skin === 'venomExtreme' ? '#63d64c' : '#3c7187'} d="M19 14h3v5h-3zM27 14h3v5h-3z" />
+            <path fill="#3c7187" d="M19 14h3v5h-3zM27 14h3v5h-3z" />
             <path fill="#744331" d="M20 24h10v3H20z" />
             {skin === 'steve' && <path fill="#5a3629" d="M10 20h4v8h5v4h15v-4h4v-8h-4v5h-5v3H20v-3h-6v-5z" />}
             {skin === 'steve' && <path fill={colors.skin} d="M22 19h6v6h-6z" />}
@@ -185,17 +369,6 @@ function CharacterSkin({ skin }) {
             {skin === 'viniccius13' && <path fill="#101116" d="M19 14h3v5h-3zM27 14h3v5h-3zM21 29h10v4H21z" />}
             {skin === 'viniccius13' && <path fill="#f1f0eb" d="M8 4h4V1h25v3h4v20h-3V7h-3V4H14v3h-3v17H8z" />}
             {skin === 'viniccius13' && <path fill="#111217" d="M10 7h3v16h-3zM37 7h3v16h-3zM34 20h11v4H34zM42 23h3v4h-3z" />}
-            {skin === 'leon' && <path fill="#3e2a22" d="M12 12h12v9H12zM25 12h12v9H25zM22 15h5v2h-5zM17 23h17v8H17z" fillOpacity=".72" />}
-            {skin === 'venomExtreme' && <path fill="#0b1210" d="M10 4h28v9H10zM10 9h7v20h-7zM31 9h7v20h-7z" fillOpacity=".82" />}
-            {skin === 'daviGamer' && <path fill="#1d0d07" d="M10 4h28v5H10zM13 8h6v4h-6zM29 7h9v5h-9z" />}
-            {skin === 'daviGamer' && <path fill="#55bfff" d="M19 14h3v5h-3zM27 14h3v5h-3z" />}
-            {skin === 'edukof' && <path fill="#d52731" d="M10 4h28v5H10z" opacity=".45" />}
-            {skin === 'edukof' && <path fill="#9b2229" d="M19 14h3v5h-3zM27 14h3v5h-3z" />}
-            {skin === 'feromonas' && <path fill="#a9242d" d="M7 0h34v8H7z" />}
-            {skin === 'feromonas' && <path fill="#eee6d3" d="M21 1h7v4h-7zM19 3h11v2H19z" />}
-            {skin === 'feromonas' && <path fill="#17171c" d="M12 12h10v8H12z" opacity=".72" />}
-            {skin === 'monark' && <path fill="#4c3227" d="M16 22h18v9H16zM13 18h5v7h-5z" />}
-            {skin === 'afreim' && <path fill="#6d4695" d="M10 4h28v4H10z" opacity=".55" />}
           </>
         )}
       </g>
@@ -206,17 +379,6 @@ function CharacterSkin({ skin }) {
       {skin === 'technoblade' && <path fill="#efc43b" d="M22 34h5v22h-5zM14 39h20v4H14z" />}
       {skin === 'viniccius13' && <path fill="#120b0d" d="M16 38h5v9h3v4h3v-4h3v-9h5v19h-5v-5h-3v5h-6v-5h-3v5h-5V38z" />}
       {skin === 'viniccius13' && <path fill="#ff3035" d="M14 34h20v4H14z" />}
-      {skin === 'daviGamer' && <path fill="#f0eee7" d="M18 34h12v22H18zM14 34h6v8h-6zM28 34h6v8h-6z" />}
-      {skin === 'daviGamer' && <path fill="#0a57ac" d="M22 35h5v5h-5zM23 40h4v13h-4zM18 53h12v4H18z" />}
-      {skin === 'daviGamer' && <path fill="#020817" d="M14 42h5v17h-5zM29 42h5v17h-5z" />}
-      {skin === 'authenticGames' && <path fill="#fff" d="M18 34h12v6H18zM21 42h6v13h-6z" />}
-      {skin === 'leon' && <path fill="#dae9e2" d="M20 37h8v3h-8zM22 40h4v5h-4z" />}
-      {skin === 'venomExtreme' && <path fill="#65d34d" d="M21 35h6v5h4v5h-4v10h-6V45h-4v-5h4z" />}
-      {skin === 'edukof' && <path fill="#ffd83d" d="M23 35h8l-5 8h5L18 57l5-10h-6z" />}
-      {skin === 'feromonas' && <path fill="#d5ae36" d="M14 35h4v24h-4zM30 35h4v24h-4zM14 50h20v4H14z" />}
-      {skin === 'feromonas' && <path fill="#f0e8d5" d="M21 38h7v7h-7zM19 40h11v3H19zM22 45h2v3h-2zM27 45h2v3h-2z" />}
-      {skin === 'monark' && <path fill="#d7e6ca" d="M20 39h9v13h-9zM22 41h5v3h-5zM22 46h5v4h-5z" />}
-      {skin === 'afreim' && <path fill="#efe7ff" d="M20 39h9v4h-9zM18 43h4v11h-4zM27 43h4v11h-4zM22 47h5v3h-5z" />}
       <g className="creeper-mascot__steve-arm creeper-mascot__steve-arm--back">
         <path fill={colors.shirtDark} d="M35 35h10v29H35z" />
         <path fill={colors.shirt} d="M35 36h7v17h-7z" />
@@ -396,6 +558,81 @@ function EnderDragon() {
   );
 }
 
+function BonusMobSprite({ mob }) {
+  if (mob === 'creeper') {
+    return (
+      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
+        <path fill="#327b31" d="M12 2h32v30h6v28H36v10H25V60H8V32h4z" />
+        <path fill="#62b64d" d="M15 5h25v27H15zM12 34h32v22H12z" />
+        <path fill="#8bd064" d="M16 6h10v7H16zM33 16h7v11h-7zM17 38h8v8h-8z" />
+        <path fill="#17351a" d="M17 15h8v9h-8zM32 15h8v9h-8zM24 27h9v7h-9zM19 33h20v12H19z" />
+        <path fill="#245b28" d="M12 56h12v14H12zM35 56h11v14H35z" />
+      </svg>
+    );
+  }
+
+  if (mob === 'slime') {
+    return (
+      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
+        <path fill="#245c2c" d="M5 17h46v47H5z" />
+        <path fill="#5eb653" d="M8 20h40v40H8z" />
+        <path fill="#9bdd7d" d="M10 22h25v10H10z" />
+        <path fill="#17381d" d="M14 34h9v11h-9zM35 34h9v11h-9zM20 49h20v7H20z" />
+      </svg>
+    );
+  }
+
+  if (mob === 'spider' || mob === 'spiderJockey') {
+    return (
+      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
+        {mob === 'spiderJockey' && (
+          <g className="bonus-mob__rider">
+            <path fill="#d8d9d2" d="M19 0h20v24H19zM24 22h11v19H24z" />
+            <path fill="#525854" d="M22 7h5v6h-5zM32 7h5v6h-5zM27 15h6v4h-6z" />
+            <path fill="#8d6338" d="M38 18h3v24h-3zM36 18h7v3h-7z" />
+          </g>
+        )}
+        <path fill="#211c1c" d="M13 39h32v23H13z" />
+        <path fill="#443735" d="M18 35h24v23H18z" />
+        <path fill="#a62b27" d="M22 42h6v5h-6zM34 42h6v5h-6z" />
+        <g className="bonus-mob__spider-legs" fill="#1b1717">
+          <path d="M13 41H4v-7H0v11h13zM13 48H2v4h11zM13 55H5v8H0v5h10l7-11z" />
+          <path d="M43 41h9v-7h4v11H43zM43 48h11v4H43zM43 55h8v8h5v5H46l-7-11z" />
+        </g>
+      </svg>
+    );
+  }
+
+  if (mob === 'skeleton') {
+    return (
+      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
+        <path fill="#d7dad3" d="M14 2h29v25H14zM23 27h12v30H23zM13 54h12v16H13zM34 54h11v16H34z" />
+        <path fill="#f0f1e9" d="M17 5h22v18H17z" />
+        <path fill="#4e5551" d="M20 10h6v7h-6zM32 10h6v7h-6zM26 19h7v5h-7z" />
+        <path fill="#916637" d="M43 22h4v40h-4zM40 22h7v4h-7zM40 58h7v4h-7z" />
+        <path fill="none" stroke="#d3ad72" strokeWidth="2" d="M46 24l8 17-8 19" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
+      <path fill="#4f8344" d="M14 2h29v26H14z" />
+      <path fill="#72a45b" d="M17 5h22v19H17z" />
+      <path fill="#243725" d="M20 11h6v6h-6zM33 11h6v6h-6zM25 21h13v4H25z" />
+      <path fill="#168e91" d="M12 28h33v27H12z" />
+      <path fill="#263b91" d="M16 54h13v17H16zM32 54h13v17H32z" />
+      <g className="bonus-mob__sword-arm">
+        <path fill="#5f9551" d="M42 30h9v27h-9z" />
+        <path fill="#2aaeb7" d="M46 5h7v32h-7zM40 10h19v7H40z" />
+        <path fill="#c9f7f4" d="M48 7h3v24h-3z" />
+        <path fill="#6a4b29" d="M46 36h7v17h-7z" />
+      </g>
+      {mob === 'jockey' && <path fill="#f2ead2" d="M8 60h42v10H8z" />}
+    </svg>
+  );
+}
+
 function CreeperMascot() {
   const [selectedMob, setSelectedMob] = useState('creeper');
   const [selectedSkin, setSelectedSkin] = useState('steve');
@@ -413,6 +650,11 @@ function CreeperMascot() {
   const [isEndermanWalking, setIsEndermanWalking] = useState(false);
   const [enderDragonFlight, setEnderDragonFlight] = useState(null);
   const [arrowShot, setArrowShot] = useState(null);
+  const [bonusMobs, setBonusMobs] = useState([]);
+  const [bonusArrows, setBonusArrows] = useState([]);
+  const [deathMessage, setDeathMessage] = useState(DEATH_MESSAGES.creeper);
+  const [mobAnnouncement, setMobAnnouncement] = useState('');
+  const [isMainMobAttacking, setIsMainMobAttacking] = useState(false);
   const mascotRef = useRef(null);
   const respawnButtonRef = useRef(null);
   const explosionTimerRef = useRef(0);
@@ -420,6 +662,8 @@ function CreeperMascot() {
   const skeletonAimRef = useRef(0);
   const skeletonFinishRef = useRef(0);
   const arrowCleanupRef = useRef(0);
+  const arrowHitRef = useRef(0);
+  const mainMeleeAttackRef = useRef(0);
   const endermanScheduleRef = useRef(0);
   const endermanMoveRef = useRef(0);
   const endermanFinishRef = useRef(0);
@@ -448,6 +692,58 @@ function CreeperMascot() {
   const creeperVerticalPositionRef = useRef(0);
   const creeperDirectionRef = useRef(creeperDirection);
   const lastDirectionChangeRef = useRef(0);
+  const bonusMobsRef = useRef([]);
+  const bonusArrowsRef = useRef([]);
+  const mainMeleeAttackingRef = useRef(false);
+
+  const triggerGameOver = (message) => {
+    if (statusRef.current === 'exploded') return;
+    window.clearTimeout(explosionTimerRef.current);
+    window.clearTimeout(mainMeleeAttackRef.current);
+    window.clearTimeout(skeletonScheduleRef.current);
+    window.clearTimeout(skeletonAimRef.current);
+    window.clearTimeout(skeletonFinishRef.current);
+    window.clearTimeout(arrowCleanupRef.current);
+    window.clearTimeout(arrowHitRef.current);
+    statusRef.current = 'exploded';
+    mainMeleeAttackingRef.current = false;
+    skeletonShootingRef.current = false;
+    bonusArrowsRef.current = [];
+    setIsMainMobAttacking(false);
+    setIsSkeletonShooting(false);
+    setArrowShot(null);
+    setBonusArrows([]);
+    setDeathMessage(message);
+    setStatus('exploded');
+  };
+
+  const clearBonusThreats = () => {
+    bonusMobsRef.current = [];
+    bonusArrowsRef.current = [];
+    setBonusMobs([]);
+    setBonusArrows([]);
+    setMobAnnouncement('');
+  };
+
+  const spawnBonusMob = (tier) => {
+    const mob = HOSTILE_MOBS[Math.floor(Math.random() * HOSTILE_MOBS.length)];
+    const entersFromRight = Math.random() >= 0.5;
+    const maxY = Math.max(0, window.innerHeight - BONUS_MOB_HEIGHT - 8);
+    const nextMob = {
+      id: `${Date.now()}-${tier}-${Math.random()}`,
+      mob,
+      x: entersFromRight ? window.innerWidth + BONUS_MOB_WIDTH : -BONUS_MOB_WIDTH,
+      y: Math.random() * maxY,
+      direction: entersFromRight ? 'left' : 'right',
+      status: 'walking',
+      actionStartedAt: 0,
+      nextAttackAt: performance.now() + 2200 + Math.random() * 2200,
+    };
+
+    bonusMobsRef.current = [...bonusMobsRef.current, nextMob];
+    setBonusMobs([...bonusMobsRef.current]);
+    setMobAnnouncement(`${MOBS.find((item) => item.id === mob)?.label || mob} entrou na perseguição`);
+  };
 
   useEffect(() => {
     const updateStatus = (nextStatus) => {
@@ -458,7 +754,9 @@ function CreeperMascot() {
     const startCharging = () => {
       window.clearTimeout(explosionTimerRef.current);
       updateStatus('charging');
-      explosionTimerRef.current = window.setTimeout(() => updateStatus('exploded'), EXPLOSION_DELAY);
+      explosionTimerRef.current = window.setTimeout(() => {
+        triggerGameOver(DEATH_MESSAGES.creeper);
+      }, EXPLOSION_DELAY);
     };
 
     const cancelExplosion = () => {
@@ -481,32 +779,54 @@ function CreeperMascot() {
         const currentCreeperY = creeperVerticalPositionRef.current;
         const mobHeight = window.innerWidth <= 560 ? 72 : 96;
         const steveHeight = window.innerWidth <= 560 ? 70 : 88;
-        const creeperRight = currentCreeperX + CREEPER_WIDTH;
-        const creeperTop = currentCreeperY + mobHeight;
-        const steveRight = steveX + STEVE_WIDTH;
-        const steveTop = steveY + steveHeight;
-        const horizontalGap = currentCreeperX <= steveX
-          ? Math.max(0, steveX - creeperRight)
-          : Math.max(0, currentCreeperX - steveRight);
-        const verticalGap = currentCreeperY <= steveY
-          ? Math.max(0, steveY - creeperTop)
-          : Math.max(0, currentCreeperY - steveTop);
-        const gap = Math.hypot(horizontalGap, verticalGap);
-
-        if (selectedMob === 'creeper') {
-          const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
-          if (shouldCharge && statusRef.current === 'walking') startCharging();
-          if (!shouldCharge && statusRef.current === 'charging') cancelExplosion();
-        } else if (statusRef.current !== 'walking') {
-          cancelExplosion();
-        }
+        const gap = getEntityGap(
+          currentCreeperX,
+          currentCreeperY,
+          CREEPER_WIDTH,
+          mobHeight,
+          steveX,
+          steveY,
+          steveHeight,
+        );
 
         if (statusRef.current === 'exploded') {
           animationFrame = window.requestAnimationFrame(followSteve);
           return;
         }
 
-        if (!manualControlRef.current && selectedMob !== 'enderman' && gap <= STEVE_DANGER_RANGE && time - lastDirectionChangeRef.current >= DIRECTION_LOCK_TIME) {
+        if (selectedMob === 'creeper') {
+          const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
+          if (shouldCharge && statusRef.current === 'walking') startCharging();
+          if (!shouldCharge && statusRef.current === 'charging') cancelExplosion();
+        } else if (statusRef.current === 'charging') {
+          cancelExplosion();
+        }
+
+        if (MELEE_MOBS.has(selectedMob) && gap <= 8 && !mainMeleeAttackingRef.current) {
+          mainMeleeAttackingRef.current = true;
+          setIsMainMobAttacking(true);
+          mainMeleeAttackRef.current = window.setTimeout(() => {
+            const currentGap = getEntityGap(
+              creeperPositionRef.current,
+              creeperVerticalPositionRef.current,
+              CREEPER_WIDTH,
+              window.innerWidth <= 560 ? 72 : 96,
+              stevePositionRef.current,
+              steveVerticalPositionRef.current,
+              window.innerWidth <= 560 ? 70 : 88,
+            );
+
+            if (currentGap <= 24) triggerGameOver(DEATH_MESSAGES[selectedMob]);
+            mainMeleeAttackingRef.current = false;
+            setIsMainMobAttacking(false);
+          }, MOB_ATTACK_DELAY[selectedMob]);
+        } else if (MELEE_MOBS.has(selectedMob) && gap > 34 && mainMeleeAttackingRef.current) {
+          window.clearTimeout(mainMeleeAttackRef.current);
+          mainMeleeAttackingRef.current = false;
+          setIsMainMobAttacking(false);
+        }
+
+        if (!manualControlRef.current && !PASSIVE_MOBS.has(selectedMob) && gap <= STEVE_DANGER_RANGE && time - lastDirectionChangeRef.current >= DIRECTION_LOCK_TIME) {
           const creeperCenter = currentCreeperX + (CREEPER_WIDTH / 2);
           const steveCenter = steveX + (STEVE_WIDTH / 2);
           const escapeDirection = steveCenter >= creeperCenter ? 'right' : 'left';
@@ -612,6 +932,10 @@ function CreeperMascot() {
             diamondRef.current = nextDiamond;
             setDiamondCount(nextCount);
             setDiamond(nextDiamond);
+
+            if (nextCount % BONUS_MOB_INTERVAL === 0) {
+              spawnBonusMob(nextCount / BONUS_MOB_INTERVAL);
+            }
           }
         }
 
@@ -645,7 +969,7 @@ function CreeperMascot() {
             creeperPositionRef.current = nextEndermanX;
             creeperVerticalPositionRef.current = nextEndermanY;
           }
-        } else if (selectedMob !== 'enderman' && statusRef.current === 'walking' && !skeletonShootingRef.current && !endermanTeleportingRef.current) {
+        } else if (!PASSIVE_MOBS.has(selectedMob) && statusRef.current === 'walking' && !skeletonShootingRef.current && !mainMeleeAttackingRef.current && !endermanTeleportingRef.current) {
           const targetX = stevePositionRef.current + (STEVE_WIDTH / 2);
           const targetY = steveVerticalPositionRef.current + (steveHeight / 2);
           const currentX = currentCreeperX + (CREEPER_WIDTH / 2);
@@ -655,8 +979,11 @@ function CreeperMascot() {
           const distance = Math.hypot(deltaX, deltaY);
           const movement = Math.min(distance, CREEPER_SPEED * elapsed);
           const maxMobY = Math.max(0, window.innerHeight - mobHeight);
+          const stopGap = selectedMob === 'creeper' || RANGED_MOBS.has(selectedMob)
+            ? EXPLOSION_RANGE
+            : 0;
 
-          if (gap > EXPLOSION_RANGE && distance > 0.5) {
+          if (gap > stopGap && distance > 0.5) {
             const nextCreeperX = Math.max(0, Math.min(
               window.innerWidth - CREEPER_WIDTH,
               currentCreeperX + (deltaX / distance) * movement,
@@ -676,6 +1003,141 @@ function CreeperMascot() {
             creeperVerticalPositionRef.current = nextCreeperY;
           }
         }
+
+        let bonusStateChanged = false;
+        const maxBonusY = Math.max(0, window.innerHeight - BONUS_MOB_HEIGHT - 4);
+
+        bonusMobsRef.current.forEach((mob) => {
+          const targetX = stevePositionRef.current + (STEVE_WIDTH / 2);
+          const targetY = steveVerticalPositionRef.current + (steveHeight / 2);
+          const mobCenterX = mob.x + (BONUS_MOB_WIDTH / 2);
+          const mobCenterY = mob.y + (BONUS_MOB_HEIGHT / 2);
+          const deltaX = targetX - mobCenterX;
+          const deltaY = targetY - mobCenterY;
+          const distance = Math.max(0.001, Math.hypot(deltaX, deltaY));
+          const mobGap = getEntityGap(
+            mob.x,
+            mob.y,
+            BONUS_MOB_WIDTH,
+            BONUS_MOB_HEIGHT,
+            stevePositionRef.current,
+            steveVerticalPositionRef.current,
+            steveHeight,
+          );
+          const nextDirection = deltaX >= 0 ? 'right' : 'left';
+
+          if (nextDirection !== mob.direction) {
+            mob.direction = nextDirection;
+            bonusStateChanged = true;
+          }
+
+          if (mob.mob === 'creeper') {
+            if (mobGap <= EXPLOSION_RANGE && mob.status === 'walking') {
+              mob.status = 'charging';
+              mob.actionStartedAt = time;
+              bonusStateChanged = true;
+            } else if (mobGap > 34 && mob.status === 'charging') {
+              mob.status = 'walking';
+              mob.actionStartedAt = 0;
+              bonusStateChanged = true;
+            } else if (mob.status === 'charging' && time - mob.actionStartedAt >= EXPLOSION_DELAY) {
+              triggerGameOver(DEATH_MESSAGES.creeper);
+            }
+          } else if (RANGED_MOBS.has(mob.mob)) {
+            if (mob.status === 'walking' && time >= mob.nextAttackAt) {
+              mob.status = 'aiming';
+              mob.actionStartedAt = time;
+              bonusStateChanged = true;
+            } else if (mob.status === 'aiming' && time - mob.actionStartedAt >= SKELETON_AIM_TIME) {
+              const arrowStartX = mob.x + (mob.direction === 'right' ? 48 : 8);
+              const arrowStartY = mob.y + (mob.mob === 'spiderJockey' ? 54 : 43);
+              const arrowDeltaX = targetX - arrowStartX;
+              const arrowDeltaY = targetY - arrowStartY;
+              const arrowDistance = Math.max(1, Math.hypot(arrowDeltaX, arrowDeltaY));
+              const nextArrow = {
+                id: `${mob.id}-${Date.now()}`,
+                mob: mob.mob,
+                x: arrowStartX,
+                y: arrowStartY,
+                velocityX: (arrowDeltaX / arrowDistance) * BONUS_ARROW_SPEED,
+                velocityY: (arrowDeltaY / arrowDistance) * BONUS_ARROW_SPEED,
+                angle: Math.atan2(-arrowDeltaY, arrowDeltaX) * (180 / Math.PI),
+              };
+
+              bonusArrowsRef.current = [...bonusArrowsRef.current, nextArrow];
+              setBonusArrows([...bonusArrowsRef.current]);
+              mob.status = 'recovering';
+              mob.actionStartedAt = time;
+              bonusStateChanged = true;
+            } else if (mob.status === 'recovering' && time - mob.actionStartedAt >= 620) {
+              mob.status = 'walking';
+              mob.nextAttackAt = time + 2600 + Math.random() * 2600;
+              bonusStateChanged = true;
+            }
+          } else if (MELEE_MOBS.has(mob.mob)) {
+            if (mobGap <= 8 && mob.status === 'walking') {
+              mob.status = 'attacking';
+              mob.actionStartedAt = time;
+              bonusStateChanged = true;
+            } else if (mob.status === 'attacking' && mobGap > 34) {
+              mob.status = 'walking';
+              bonusStateChanged = true;
+            } else if (mob.status === 'attacking' && time - mob.actionStartedAt >= MOB_ATTACK_DELAY[mob.mob]) {
+              triggerGameOver(DEATH_MESSAGES[mob.mob]);
+            }
+          }
+
+          if (mob.status === 'walking' && statusRef.current !== 'exploded') {
+            const movement = Math.min(distance, (MOB_SPEED[mob.mob] || 84) * elapsed);
+            mob.x = Math.max(0, Math.min(
+              window.innerWidth - BONUS_MOB_WIDTH,
+              mob.x + (deltaX / distance) * movement,
+            ));
+            mob.y = Math.max(0, Math.min(
+              maxBonusY,
+              mob.y + (deltaY / distance) * movement,
+            ));
+          }
+
+          const mobElement = mascotRef.current?.querySelector(`[data-bonus-id="${mob.id}"]`);
+          mobElement?.style.setProperty('--bonus-mob-x', `${Math.round(mob.x)}px`);
+          mobElement?.style.setProperty('--bonus-mob-y', `${Math.round(-mob.y)}px`);
+        });
+
+        if (bonusStateChanged) setBonusMobs([...bonusMobsRef.current]);
+
+        let arrowsChanged = false;
+        bonusArrowsRef.current = bonusArrowsRef.current.filter((arrow) => {
+          arrow.x += arrow.velocityX * elapsed;
+          arrow.y += arrow.velocityY * elapsed;
+
+          const hitSteve = arrow.x >= stevePositionRef.current - 6
+            && arrow.x <= stevePositionRef.current + STEVE_WIDTH + 6
+            && arrow.y >= steveVerticalPositionRef.current - 6
+            && arrow.y <= steveVerticalPositionRef.current + steveHeight + 6;
+          const isOutside = arrow.x < -48
+            || arrow.x > window.innerWidth + 48
+            || arrow.y < -48
+            || arrow.y > window.innerHeight + 48;
+
+          if (hitSteve) {
+            triggerGameOver(DEATH_MESSAGES[arrow.mob]);
+            arrowsChanged = true;
+            return false;
+          }
+
+          if (isOutside) {
+            arrowsChanged = true;
+            return false;
+          }
+
+          const arrowElement = mascotRef.current?.querySelector(`[data-bonus-arrow-id="${arrow.id}"]`);
+          arrowElement?.style.setProperty('--bonus-arrow-x', `${Math.round(arrow.x)}px`);
+          arrowElement?.style.setProperty('--bonus-arrow-y', `${Math.round(-arrow.y)}px`);
+          return true;
+        });
+
+        if (arrowsChanged) setBonusArrows([...bonusArrowsRef.current]);
 
         mascotRef.current?.style.setProperty('--steve-x', `${Math.round(stevePositionRef.current)}px`);
         mascotRef.current?.style.setProperty('--steve-y', `${Math.round(-steveVerticalPositionRef.current)}px`);
@@ -720,6 +1182,7 @@ function CreeperMascot() {
 
     return () => {
       window.clearTimeout(explosionTimerRef.current);
+      window.clearTimeout(mainMeleeAttackRef.current);
       window.cancelAnimationFrame(animationFrame);
       cursorNearCreeperRef.current = false;
       window.removeEventListener('pointermove', handlePointerMove);
@@ -732,6 +1195,8 @@ function CreeperMascot() {
     if (status !== 'exploded') return undefined;
 
     pressedKeysRef.current.clear();
+    mainMeleeAttackingRef.current = false;
+    setIsMainMobAttacking(false);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const focusFrame = window.requestAnimationFrame(() => respawnButtonRef.current?.focus());
@@ -932,8 +1397,12 @@ function CreeperMascot() {
     window.clearTimeout(skeletonAimRef.current);
     window.clearTimeout(skeletonFinishRef.current);
     window.clearTimeout(arrowCleanupRef.current);
+    window.clearTimeout(arrowHitRef.current);
+    window.clearTimeout(mainMeleeAttackRef.current);
     skeletonShootingRef.current = false;
+    mainMeleeAttackingRef.current = false;
     setIsSkeletonShooting(false);
+    setIsMainMobAttacking(false);
     setArrowShot(null);
 
     const isSkeletonMob = selectedMob === 'skeleton' || selectedMob === 'spiderJockey';
@@ -984,6 +1453,15 @@ function CreeperMascot() {
             direction,
             mounted,
           });
+          arrowHitRef.current = window.setTimeout(() => {
+            const currentSteveCenter = stevePositionRef.current + (STEVE_WIDTH / 2);
+            const currentSteveCenterY = steveVerticalPositionRef.current
+              + (window.innerWidth <= 560 ? 35 : 44);
+
+            if (Math.hypot(currentSteveCenter - steveCenter, currentSteveCenterY - steveCenterY) <= 42) {
+              triggerGameOver(DEATH_MESSAGES[selectedMob]);
+            }
+          }, duration);
           arrowCleanupRef.current = window.setTimeout(() => setArrowShot(null), duration + 80);
         }, SKELETON_AIM_TIME);
 
@@ -1002,6 +1480,7 @@ function CreeperMascot() {
       window.clearTimeout(skeletonAimRef.current);
       window.clearTimeout(skeletonFinishRef.current);
       window.clearTimeout(arrowCleanupRef.current);
+      window.clearTimeout(arrowHitRef.current);
       skeletonShootingRef.current = false;
     };
   }, [selectedMob]);
@@ -1012,6 +1491,8 @@ function CreeperMascot() {
     window.clearTimeout(skeletonAimRef.current);
     window.clearTimeout(skeletonFinishRef.current);
     window.clearTimeout(arrowCleanupRef.current);
+    window.clearTimeout(arrowHitRef.current);
+    window.clearTimeout(mainMeleeAttackRef.current);
     window.clearTimeout(endermanScheduleRef.current);
     window.clearTimeout(endermanMoveRef.current);
     window.clearTimeout(endermanFinishRef.current);
@@ -1020,15 +1501,18 @@ function CreeperMascot() {
     window.clearTimeout(enderDragonScheduleRef.current);
     window.clearTimeout(enderDragonCleanupRef.current);
     skeletonShootingRef.current = false;
+    mainMeleeAttackingRef.current = false;
     endermanTeleportingRef.current = false;
     endermanWalkingRef.current = false;
     statusRef.current = 'walking';
     setStatus('walking');
     setIsSkeletonShooting(false);
+    setIsMainMobAttacking(false);
     setIsEndermanTeleporting(false);
     setIsEndermanWalking(false);
     setEnderDragonFlight(null);
     setArrowShot(null);
+    setDeathMessage(DEATH_MESSAGES.creeper);
     setSelectedMob(mob);
   };
 
@@ -1044,6 +1528,8 @@ function CreeperMascot() {
     setIsSteveMoving(!nextManualControl);
     setIsSteveSprinting(false);
     setIsSteveJumping(false);
+    clearBonusThreats();
+    setDeathMessage(DEATH_MESSAGES.creeper);
 
     if (nextManualControl) {
       const nextDiamond = createRandomDiamond(
@@ -1066,6 +1552,8 @@ function CreeperMascot() {
 
   const respawnCharacter = () => {
     window.clearTimeout(explosionTimerRef.current);
+    window.clearTimeout(mainMeleeAttackRef.current);
+    window.clearTimeout(arrowHitRef.current);
     pressedKeysRef.current.clear();
     cursorNearCreeperRef.current = false;
 
@@ -1081,6 +1569,9 @@ function CreeperMascot() {
     steveJumpingRef.current = false;
     steveJumpVelocityRef.current = 0;
     steveJumpBaseYRef.current = 0;
+    mainMeleeAttackingRef.current = false;
+    clearBonusThreats();
+    setDeathMessage(DEATH_MESSAGES.creeper);
 
     diamondCountRef.current = 0;
     setDiamondCount(0);
@@ -1099,6 +1590,7 @@ function CreeperMascot() {
     setIsSteveMoving(shouldMoveAutomatically);
     setIsSteveSprinting(false);
     setIsSteveJumping(false);
+    setIsMainMobAttacking(false);
     setSteveDirection('right');
     setCreeperDirection('right');
     setStatus('walking');
@@ -1112,7 +1604,7 @@ function CreeperMascot() {
   return (
     <div
       ref={mascotRef}
-      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}${isSteveSprinting ? ' creeper-mascot--steve-sprinting' : ''}${isSteveJumping ? ' creeper-mascot--steve-jumping' : ''}`}
+      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isMainMobAttacking ? ' creeper-mascot--main-attacking' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}${isSteveSprinting ? ' creeper-mascot--steve-sprinting' : ''}${isSteveJumping ? ' creeper-mascot--steve-jumping' : ''}`}
       style={{ '--creeper-x': '12px', '--creeper-y': '0px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
     >
       {status === 'exploded' && (
@@ -1128,7 +1620,7 @@ function CreeperMascot() {
             <p className="minecraft-game-over__score">Diamantes: <strong>{diamondCount}</strong></p>
             <span className="minecraft-game-over__crosshair" aria-hidden="true">+</span>
             <p id="game-over-message" className="minecraft-game-over__message">
-              Você foi explodido por um Creeper
+              {deathMessage}
             </p>
             <button
               ref={respawnButtonRef}
@@ -1159,11 +1651,13 @@ function CreeperMascot() {
       )}
       {isManualControl && diamond && (
         <>
-          <output className="diamond-counter" aria-live="polite" aria-label={`${diamondCount} diamantes coletados`}>
+          <output className="diamond-counter" aria-live="polite" aria-label={`${diamondCount} diamantes coletados e ${bonusMobs.length} ameaças adicionais`}>
             <DiamondIcon className="diamond-counter__icon" />
             <span aria-hidden="true">×</span>
             <strong aria-hidden="true">{diamondCount}</strong>
+            <span className="diamond-counter__threats" aria-hidden="true">MOBS {bonusMobs.length}</span>
           </output>
+          <span className="sr-only" role="status" aria-live="assertive">{mobAnnouncement}</span>
           <span
             key={diamond.id}
             className="minecraft-diamond"
@@ -1184,7 +1678,7 @@ function CreeperMascot() {
         onClick={toggleCharacterControl}
       >
         <span className="character-control__keys" aria-hidden="true">WASD · CTRL · ESPAÇO</span>
-        <span>{isManualControl ? 'Parar de controlar personagem' : 'Controlar personagem'}</span>
+        <span>{isManualControl ? 'Parar de controlar personagem' : 'Jogar'}</span>
       </button>
       <nav className="mob-dock skin-dock" aria-label="Escolher skin do personagem">
         <span className="mob-dock__label" aria-hidden="true">SKINS</span>
@@ -1600,6 +2094,43 @@ function CreeperMascot() {
           {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
         </span>
       </div>
+      {bonusMobs.map((mob) => (
+        <span
+          key={mob.id}
+          data-bonus-id={mob.id}
+          className={`bonus-mob bonus-mob--${mob.mob} bonus-mob--${mob.status} bonus-mob--facing-${mob.direction}`}
+          style={{
+            '--bonus-mob-x': `${Math.round(mob.x)}px`,
+            '--bonus-mob-y': `${Math.round(-mob.y)}px`,
+          }}
+          aria-hidden="true"
+        >
+          <span className="bonus-mob__sprite">
+            <BonusMobSprite mob={mob.mob} />
+          </span>
+          <span className="bonus-mob__shadow" />
+          {mob.mob === 'creeper' && mob.status === 'charging' && <span className="bonus-mob__fuse">!</span>}
+        </span>
+      ))}
+      {bonusArrows.map((arrow) => (
+        <span
+          key={arrow.id}
+          data-bonus-arrow-id={arrow.id}
+          className="bonus-arrow"
+          style={{
+            '--bonus-arrow-x': `${Math.round(arrow.x)}px`,
+            '--bonus-arrow-y': `${Math.round(-arrow.y)}px`,
+            '--bonus-arrow-angle': `${arrow.angle}deg`,
+          }}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 40 12" shapeRendering="crispEdges">
+            <path fill="#d9d9ce" d="M0 4h29v4H0z" />
+            <path fill="#f5f4e8" d="M27 2h7v8h-7zM34 0h6v12h-6z" />
+            <path fill="#765736" d="M0 1h4v10H0zM4 3h5v6H4z" />
+          </svg>
+        </span>
+      ))}
       {arrowShot && (
         <span
           key={arrowShot.id}
