@@ -9,6 +9,9 @@ const CREEPER_SPEED = 105;
 const STEVE_SPEED = 82;
 const STEVE_ESCAPE_SPEED = 148;
 const STEVE_MANUAL_SPEED = 190;
+const STEVE_MANUAL_SPRINT_SPEED = 310;
+const DIAMOND_SIZE = 32;
+const DIAMOND_MIN_DISTANCE = 150;
 const STEVE_DANGER_RANGE = 180;
 const DIRECTION_LOCK_TIME = 550;
 const SKELETON_MIN_SHOT_INTERVAL = 5000;
@@ -65,6 +68,53 @@ const SKIN_COLORS = {
   monark: { skin: '#b97755', skinLight: '#dc9870', hair: '#3d2b22', shirt: '#426f38', shirtLight: '#61964f', shirtDark: '#284722', pants: '#30343a', boots: '#171a1d' },
   afreim: { skin: '#ae6d50', skinLight: '#d99169', hair: '#35231f', shirt: '#653c91', shirtLight: '#8c59bd', shirtDark: '#3e285e', pants: '#282c45', boots: '#131626' },
 };
+
+function createRandomDiamond(steveX, steveY) {
+  const sidePadding = window.innerWidth <= 560 ? 56 : 88;
+  const minX = Math.min(sidePadding, Math.max(8, window.innerWidth - DIAMOND_SIZE));
+  const maxX = Math.max(minX, window.innerWidth - sidePadding - DIAMOND_SIZE);
+  const minY = 54;
+  const maxY = Math.max(minY, window.innerHeight - 150 - DIAMOND_SIZE);
+  const steveCenterX = steveX + (STEVE_WIDTH / 2);
+  const steveCenterY = steveY + (window.innerWidth <= 560 ? 35 : 44);
+  let nextDiamond;
+
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    nextDiamond = {
+      id: `${Date.now()}-${Math.random()}`,
+      x: minX + Math.random() * (maxX - minX),
+      y: minY + Math.random() * (maxY - minY),
+    };
+
+    const distance = Math.hypot(
+      nextDiamond.x + (DIAMOND_SIZE / 2) - steveCenterX,
+      nextDiamond.y + (DIAMOND_SIZE / 2) - steveCenterY,
+    );
+
+    if (distance >= DIAMOND_MIN_DISTANCE) break;
+  }
+
+  return nextDiamond;
+}
+
+function DiamondIcon({ className = '' }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 32 32"
+      aria-hidden="true"
+      shapeRendering="crispEdges"
+    >
+      <path fill="#143d4b" d="M8 2h16v3h4v7h-3v4h-3v4h-3v4h-6v-4h-3v-4H7v-4H4V5h4z" />
+      <path fill="#72ffff" d="M9 5h14v3h3v4h-4v4h-3v4h-6v-4h-3v-4H7V8h2z" />
+      <path fill="#dcffff" d="M10 5h8v3h-5v4H8V8h2z" />
+      <path fill="#32d7df" d="M18 8h8v4h-4v4h-3v4h-3v-8z" />
+      <path fill="#1996ae" d="M7 12h6v4h3v4h3v4h-6v-4h-3v-4H7z" />
+      <path fill="#0c6c82" d="M4 8h3v4h3v4h3v4h3v4h-3v-4h-3v-4H7v-4H4z" />
+      <path fill="#baffff" d="M13 8h5v4h-5z" />
+    </svg>
+  );
+}
 
 function SkinDockIcon({ skin }) {
   const colors = SKIN_COLORS[skin];
@@ -336,6 +386,9 @@ function CreeperMascot() {
   const [selectedSkin, setSelectedSkin] = useState('steve');
   const [isManualControl, setIsManualControl] = useState(false);
   const [isSteveMoving, setIsSteveMoving] = useState(true);
+  const [isSteveSprinting, setIsSteveSprinting] = useState(false);
+  const [diamond, setDiamond] = useState(null);
+  const [diamondCount, setDiamondCount] = useState(0);
   const [status, setStatus] = useState('walking');
   const [steveDirection, setSteveDirection] = useState('right');
   const [creeperDirection, setCreeperDirection] = useState('right');
@@ -345,6 +398,7 @@ function CreeperMascot() {
   const [enderDragonFlight, setEnderDragonFlight] = useState(null);
   const [arrowShot, setArrowShot] = useState(null);
   const mascotRef = useRef(null);
+  const respawnButtonRef = useRef(null);
   const explosionTimerRef = useRef(0);
   const skeletonScheduleRef = useRef(0);
   const skeletonAimRef = useRef(0);
@@ -368,6 +422,9 @@ function CreeperMascot() {
   const manualControlRef = useRef(false);
   const pressedKeysRef = useRef(new Set());
   const steveMovingRef = useRef(true);
+  const steveSprintingRef = useRef(false);
+  const diamondRef = useRef(null);
+  const diamondCountRef = useRef(0);
   const creeperPositionRef = useRef(12);
   const creeperVerticalPositionRef = useRef(0);
   const creeperDirectionRef = useRef(creeperDirection);
@@ -420,9 +477,14 @@ function CreeperMascot() {
         if (selectedMob === 'creeper') {
           const shouldCharge = gap <= EXPLOSION_RANGE || cursorNearCreeperRef.current;
           if (shouldCharge && statusRef.current === 'walking') startCharging();
-          if (!shouldCharge && statusRef.current !== 'walking') cancelExplosion();
+          if (!shouldCharge && statusRef.current === 'charging') cancelExplosion();
         } else if (statusRef.current !== 'walking') {
           cancelExplosion();
+        }
+
+        if (statusRef.current === 'exploded') {
+          animationFrame = window.requestAnimationFrame(followSteve);
+          return;
         }
 
         if (!manualControlRef.current && selectedMob !== 'enderman' && gap <= STEVE_DANGER_RANGE && time - lastDirectionChangeRef.current >= DIRECTION_LOCK_TIME) {
@@ -445,11 +507,18 @@ function CreeperMascot() {
           const verticalInput = (pressedKeysRef.current.has('w') ? 1 : 0)
             - (pressedKeysRef.current.has('s') ? 1 : 0);
           const isMoving = horizontalInput !== 0 || verticalInput !== 0;
+          const isSprinting = isMoving && pressedKeysRef.current.has('control');
           const diagonalScale = horizontalInput !== 0 && verticalInput !== 0 ? Math.SQRT1_2 : 1;
+          const manualSpeed = isSprinting ? STEVE_MANUAL_SPRINT_SPEED : STEVE_MANUAL_SPEED;
 
           if (isMoving !== steveMovingRef.current) {
             steveMovingRef.current = isMoving;
             setIsSteveMoving(isMoving);
+          }
+
+          if (isSprinting !== steveSprintingRef.current) {
+            steveSprintingRef.current = isSprinting;
+            setIsSteveSprinting(isSprinting);
           }
 
           if (horizontalInput !== 0) {
@@ -460,13 +529,13 @@ function CreeperMascot() {
             }
           }
 
-          nextSteveX += horizontalInput * STEVE_MANUAL_SPEED * diagonalScale * elapsed;
+          nextSteveX += horizontalInput * manualSpeed * diagonalScale * elapsed;
           const maxVerticalPosition = Math.max(0, window.innerHeight - 118);
           steveVerticalPositionRef.current = Math.max(
             0,
             Math.min(
               maxVerticalPosition,
-              steveVerticalPositionRef.current + verticalInput * STEVE_MANUAL_SPEED * diagonalScale * elapsed,
+              steveVerticalPositionRef.current + verticalInput * manualSpeed * diagonalScale * elapsed,
             ),
           );
         } else {
@@ -478,6 +547,29 @@ function CreeperMascot() {
         if (nextSteveX < -STEVE_WIDTH) nextSteveX = window.innerWidth;
 
         stevePositionRef.current = nextSteveX;
+
+        const currentDiamond = diamondRef.current;
+        if (manualControlRef.current && currentDiamond) {
+          const diamondRight = currentDiamond.x + DIAMOND_SIZE;
+          const diamondTop = currentDiamond.y + DIAMOND_SIZE;
+          const overlapsDiamond = stevePositionRef.current < diamondRight
+            && stevePositionRef.current + STEVE_WIDTH > currentDiamond.x
+            && steveVerticalPositionRef.current < diamondTop
+            && steveVerticalPositionRef.current + steveHeight > currentDiamond.y;
+
+          if (overlapsDiamond) {
+            const nextCount = diamondCountRef.current + 1;
+            const nextDiamond = createRandomDiamond(
+              stevePositionRef.current,
+              steveVerticalPositionRef.current,
+            );
+
+            diamondCountRef.current = nextCount;
+            diamondRef.current = nextDiamond;
+            setDiamondCount(nextCount);
+            setDiamond(nextDiamond);
+          }
+        }
 
         if (selectedMob === 'enderman' && endermanWalkingRef.current && !endermanTeleportingRef.current) {
           const targetX = stevePositionRef.current + (STEVE_WIDTH / 2);
@@ -593,6 +685,20 @@ function CreeperMascot() {
   }, [selectedMob]);
 
   useEffect(() => {
+    if (status !== 'exploded') return undefined;
+
+    pressedKeysRef.current.clear();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusFrame = window.requestAnimationFrame(() => respawnButtonRef.current?.focus());
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [status]);
+
+  useEffect(() => {
     window.clearTimeout(enderDragonScheduleRef.current);
     window.clearTimeout(enderDragonCleanupRef.current);
     setEnderDragonFlight(null);
@@ -639,7 +745,7 @@ function CreeperMascot() {
       if (interactiveTags.has(event.target.tagName) || event.target.isContentEditable) return;
 
       const key = event.key.toLowerCase();
-      if (!['w', 'a', 's', 'd'].includes(key)) return;
+      if (!['w', 'a', 's', 'd', 'control'].includes(key)) return;
 
       event.preventDefault();
       pressedKeysRef.current.add(key);
@@ -647,7 +753,7 @@ function CreeperMascot() {
 
     const handleKeyUp = (event) => {
       const key = event.key.toLowerCase();
-      if (!['w', 'a', 's', 'd'].includes(key)) return;
+      if (!['w', 'a', 's', 'd', 'control'].includes(key)) return;
       pressedKeysRef.current.delete(key);
     };
 
@@ -877,9 +983,22 @@ function CreeperMascot() {
     manualControlRef.current = nextManualControl;
     pressedKeysRef.current.clear();
     steveMovingRef.current = !nextManualControl;
+    steveSprintingRef.current = false;
     setIsSteveMoving(!nextManualControl);
+    setIsSteveSprinting(false);
 
-    if (!nextManualControl) {
+    if (nextManualControl) {
+      const nextDiamond = createRandomDiamond(
+        stevePositionRef.current,
+        steveVerticalPositionRef.current,
+      );
+      diamondCountRef.current = 0;
+      diamondRef.current = nextDiamond;
+      setDiamondCount(0);
+      setDiamond(nextDiamond);
+    } else {
+      diamondRef.current = null;
+      setDiamond(null);
       steveVerticalPositionRef.current = 0;
       mascotRef.current?.style.setProperty('--steve-y', '0px');
     }
@@ -887,12 +1006,79 @@ function CreeperMascot() {
     setIsManualControl(nextManualControl);
   };
 
+  const respawnCharacter = () => {
+    window.clearTimeout(explosionTimerRef.current);
+    pressedKeysRef.current.clear();
+    cursorNearCreeperRef.current = false;
+
+    const initialSteveX = Math.max(64, window.innerWidth - 64);
+    stevePositionRef.current = initialSteveX;
+    steveVerticalPositionRef.current = 0;
+    creeperPositionRef.current = 12;
+    creeperVerticalPositionRef.current = 0;
+    steveDirectionRef.current = 'right';
+    creeperDirectionRef.current = 'right';
+    lastDirectionChangeRef.current = 0;
+    statusRef.current = 'walking';
+
+    diamondCountRef.current = 0;
+    setDiamondCount(0);
+    if (manualControlRef.current) {
+      const nextDiamond = createRandomDiamond(initialSteveX, 0);
+      diamondRef.current = nextDiamond;
+      setDiamond(nextDiamond);
+    } else {
+      diamondRef.current = null;
+      setDiamond(null);
+    }
+
+    const shouldMoveAutomatically = !manualControlRef.current;
+    steveMovingRef.current = shouldMoveAutomatically;
+    steveSprintingRef.current = false;
+    setIsSteveMoving(shouldMoveAutomatically);
+    setIsSteveSprinting(false);
+    setSteveDirection('right');
+    setCreeperDirection('right');
+    setStatus('walking');
+
+    mascotRef.current?.style.setProperty('--steve-x', `${Math.round(initialSteveX)}px`);
+    mascotRef.current?.style.setProperty('--steve-y', '0px');
+    mascotRef.current?.style.setProperty('--creeper-x', '12px');
+    mascotRef.current?.style.setProperty('--creeper-y', '0px');
+  };
+
   return (
     <div
       ref={mascotRef}
-      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}`}
+      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}${isSteveSprinting ? ' creeper-mascot--steve-sprinting' : ''}`}
       style={{ '--creeper-x': '12px', '--creeper-y': '0px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
     >
+      {status === 'exploded' && (
+        <section
+          className="minecraft-game-over"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="game-over-title"
+          aria-describedby="game-over-message"
+        >
+          <div className="minecraft-game-over__content">
+            <h2 id="game-over-title">Game Over!</h2>
+            <p className="minecraft-game-over__score">Diamantes: <strong>{diamondCount}</strong></p>
+            <span className="minecraft-game-over__crosshair" aria-hidden="true">+</span>
+            <p id="game-over-message" className="minecraft-game-over__message">
+              Você foi explodido por um Creeper
+            </p>
+            <button
+              ref={respawnButtonRef}
+              className="minecraft-game-over__respawn"
+              type="button"
+              onClick={respawnCharacter}
+            >
+              Renascer
+            </button>
+          </div>
+        </section>
+      )}
       {enderDragonFlight && (
         <span
           className={`ender-dragon-flight ender-dragon-flight--${enderDragonFlight.direction}`}
@@ -909,13 +1095,33 @@ function CreeperMascot() {
           </span>
         </span>
       )}
+      {isManualControl && diamond && (
+        <>
+          <output className="diamond-counter" aria-live="polite" aria-label={`${diamondCount} diamantes coletados`}>
+            <DiamondIcon className="diamond-counter__icon" />
+            <span aria-hidden="true">×</span>
+            <strong aria-hidden="true">{diamondCount}</strong>
+          </output>
+          <span
+            key={diamond.id}
+            className="minecraft-diamond"
+            style={{
+              '--diamond-x': `${Math.round(diamond.x)}px`,
+              '--diamond-y': `${Math.round(diamond.y)}px`,
+            }}
+            aria-hidden="true"
+          >
+            <DiamondIcon />
+          </span>
+        </>
+      )}
       <button
         className="character-control"
         type="button"
         aria-pressed={isManualControl}
         onClick={toggleCharacterControl}
       >
-        <span className="character-control__keys" aria-hidden="true">WASD</span>
+        <span className="character-control__keys" aria-hidden="true">WASD + CTRL</span>
         <span>{isManualControl ? 'Parar de controlar personagem' : 'Controlar personagem'}</span>
       </button>
       <nav className="mob-dock skin-dock" aria-label="Escolher skin do personagem">

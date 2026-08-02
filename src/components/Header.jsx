@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { profile } from '../data/profile';
 import Icon from './Icon';
 
@@ -12,13 +12,40 @@ const navItems = [
   ['Contato', '#contato'],
 ];
 
-function Header({ onOpenCoffeeModal, theme, onToggleTheme }) {
+const themeOptions = [
+  { id: 'light', label: 'Claro', icon: 'sun' },
+  { id: 'dark', label: 'Escuro', icon: 'moon' },
+  { id: 'nether', label: 'Nether', icon: 'flame' },
+  { id: 'end', label: 'The End', icon: 'end' },
+];
+
+function Header({ onOpenCoffeeModal, theme, onThemeChange }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const themeSelectorRef = useRef(null);
+  const activeTheme = themeOptions.find((option) => option.id === theme) || themeOptions[0];
 
   useEffect(() => {
     document.body.classList.toggle('menu-open', isMenuOpen);
     return () => document.body.classList.remove('menu-open');
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (!isThemeMenuOpen) return undefined;
+
+    const closeThemeMenu = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return;
+      if (event.type === 'pointerdown' && themeSelectorRef.current?.contains(event.target)) return;
+      setIsThemeMenuOpen(false);
+    };
+
+    window.addEventListener('pointerdown', closeThemeMenu);
+    window.addEventListener('keydown', closeThemeMenu);
+    return () => {
+      window.removeEventListener('pointerdown', closeThemeMenu);
+      window.removeEventListener('keydown', closeThemeMenu);
+    };
+  }, [isThemeMenuOpen]);
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -52,16 +79,39 @@ function Header({ onOpenCoffeeModal, theme, onToggleTheme }) {
       </nav>
 
       <div className="header-actions">
-        <button
-          className="theme-toggle"
-          type="button"
-          aria-label={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
-          title={theme === 'light' ? 'Modo escuro' : 'Modo claro'}
-          onClick={onToggleTheme}
-        >
-          <Icon name={theme === 'light' ? 'moon' : 'sun'} size={19} />
-          <span>{theme === 'light' ? 'Escuro' : 'Claro'}</span>
-        </button>
+        <div className="theme-selector" ref={themeSelectorRef}>
+          <button
+            className="theme-toggle"
+            type="button"
+            aria-label={`Tema atual: ${activeTheme.label}. Escolher tema`}
+            aria-haspopup="true"
+            aria-expanded={isThemeMenuOpen}
+            onClick={() => setIsThemeMenuOpen((value) => !value)}
+          >
+            <Icon name={activeTheme.icon} size={19} />
+            <span>{activeTheme.label}</span>
+            <Icon name="chevronDown" size={14} className="theme-toggle__chevron" />
+          </button>
+          {isThemeMenuOpen && (
+            <div className="theme-menu" role="group" aria-label="Escolher tema do site">
+              {themeOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={theme === option.id}
+                  onClick={() => {
+                    onThemeChange(option.id);
+                    setIsThemeMenuOpen(false);
+                  }}
+                >
+                  <Icon name={option.icon} size={18} />
+                  <span>{option.label}</span>
+                  <span className="theme-menu__check" aria-hidden="true">{theme === option.id ? '■' : ''}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <a className="header-cta" href={`mailto:${profile.contact.email}`}>
           Vamos conversar
           <Icon name="arrow" size={17} />

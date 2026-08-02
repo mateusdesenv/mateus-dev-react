@@ -12,6 +12,8 @@ import Icon from './components/Icon';
 import Projects from './components/Projects';
 import Skills from './components/Skills';
 
+const THEMES = ['light', 'dark', 'nether', 'end'];
+
 function MinecraftBat() {
   return (
     <svg viewBox="0 0 48 30" role="presentation" shapeRendering="crispEdges">
@@ -36,32 +38,66 @@ function MinecraftBat() {
 
 function MinecraftParrot({ variant = 0 }) {
   const palettes = [
-    { body: '#d93636', light: '#f15a47', wing: '#2765bd', wingLight: '#52a8dd', tail: '#21549b' },
-    { body: '#258f45', light: '#47bd62', wing: '#e5c12d', wingLight: '#fff06a', tail: '#176f3a' },
-    { body: '#2469b2', light: '#43a2df', wing: '#e24439', wingLight: '#ff7660', tail: '#1d4b91' },
+    {
+      crown: '#00a93a', crownLight: '#00d358', crest: '#087a28', crestTip: '#06617f',
+      body: '#b18a00', bodyLight: '#d8ad00', wing: '#087493', wingLight: '#0fbcea',
+      wingDark: '#07586f', tail: '#087590', tailTip: '#084b61', cheek: '#aeb7b6',
+    },
+    {
+      crown: '#e3c620', crownLight: '#ffe342', crest: '#8f8020', crestTip: '#9f8700',
+      body: '#55575a', bodyLight: '#747679', wing: '#626467', wingLight: '#939598',
+      wingDark: '#3c3e40', tail: '#55575a', tailTip: '#333538', cheek: '#a5a6a4',
+    },
+    {
+      crown: '#d40707', crownLight: '#f10b09', crest: '#9c0000', crestTip: '#8a0000',
+      body: '#a90608', bodyLight: '#ce1010', wing: '#cf0a0a', wingLight: '#f51212',
+      wingDark: '#821004', tail: '#2457a6', tailTip: '#083a8a', cheek: '#b99b91', accent: '#aba300',
+    },
+    {
+      crown: '#1526bf', crownLight: '#1e37e2', crest: '#112284', crestTip: '#0b195d',
+      body: '#101f8e', bodyLight: '#182fb8', wing: '#132694', wingLight: '#203dc2',
+      wingDark: '#0a175e', tail: '#132276', tailTip: '#09144e', cheek: '#aaa99f', accent: '#9c9b00',
+    },
+    {
+      crown: '#68ad00', crownLight: '#85dc00', crest: '#3e7000', crestTip: '#315d00',
+      body: '#426d00', bodyLight: '#568c00', wing: '#477600', wingLight: '#639e00',
+      wingDark: '#315500', tail: '#3e6700', tailTip: '#294900', cheek: '#aeafa6',
+    },
   ];
   const palette = palettes[variant % palettes.length];
 
   return (
-    <svg viewBox="0 0 48 38" role="presentation" shapeRendering="crispEdges">
+    <svg viewBox="0 0 64 52" role="presentation" shapeRendering="crispEdges">
+      <g className="minecraft-parrot__crest">
+        <path fill={palette.crest} d="M17 1h5v10h-3v8h-5v-8h3z" />
+        <path fill={palette.crestTip} d="M17 1h5v7h-5z" />
+        <path fill={palette.crest} d="M27 0h5v10h-3v8h-5v-8h3z" />
+        <path fill={palette.crestTip} d="M27 0h5v7h-5z" />
+      </g>
       <g className="bat-swarm__wing bat-swarm__wing--left">
-        <path fill="#152b3a" d="M19 11h-6V7H5v4H1v14h5v-4h7v5h6z" />
-        <path fill={palette.wing} d="M16 12h-5V10H7v3H4v8h4v-3h5v4h3z" />
-        <path fill={palette.wingLight} d="M13 13H9v3H6v2h7v3h2z" />
+        <path fill={palette.wingDark} d="M27 22h12v4h7v5h5v8h-7v-4h-8v-5h-9z" />
+        <path fill={palette.wing} d="M29 22h9v4h7v5h4v4h-6v-3h-8v-5h-6z" />
       </g>
+      <path fill={palette.tailTip} d="M42 35h11v3h9v6h-11v-3H40z" />
+      <path fill={palette.tail} d="M41 33h12v4h8v4h-10v-2H40z" />
+      {palette.accent && <path fill={palette.accent} d="M45 34h7v4h7v3h-8v-2h-8z" />}
+      <path fill={palette.body} d="M17 22h22v4h7v8h5v7h-7v5h-8v4H24v-5h-5v-8h-4V27h2z" />
+      <path fill={palette.bodyLight} d="M17 24h11v4h5v6h5v10h-5v4h-8v-5h-5v-8h-3z" />
+      <path fill={palette.crown} d="M8 12h29v15H8z" />
+      <path fill={palette.crownLight} d="M8 12h20v5H8z" />
+      <path fill={palette.wingDark} d="M32 12h5v15h-5z" />
+      <path fill="#090b0c" d="M10 17h13v12H10z" />
+      <path fill={palette.cheek} d="M23 17h9v12h-9z" />
+      <path fill="#f2f1e9" d="M24 18h7v6h-7z" />
+      <path fill="#111315" d="M27 18h4v5h-4z" />
+      <path fill="#e4bb08" d="M5 24h7v3h6v5h-8v-3H6z" />
+      <path fill="#76510b" d="M9 29h8v4h-6v-2H9z" />
       <g className="bat-swarm__wing bat-swarm__wing--right">
-        <path fill="#152b3a" d="M29 11h6V7h8v4h4v14h-5v-4h-7v5h-6z" />
-        <path fill={palette.wing} d="M32 12h5V10h4v3h3v8h-4v-3h-5v4h-3z" />
-        <path fill={palette.wingLight} d="M35 13h4v3h3v2h-7v3h-2z" />
+        <path fill={palette.wingDark} d="M29 23h14v4h5v12h-5v7h-8v-4h-6z" />
+        <path fill={palette.wing} d="M30 22h12v5h5v11h-5v6h-6v-4h-6z" />
+        <path fill={palette.wingLight} d="M30 22h5v15h-5zM35 25h5v14h-5z" />
+        {palette.accent && <path fill={palette.accent} d="M40 28h6v8h-6z" />}
       </g>
-      <path fill="#152b3a" d="M17 4h14v5h4v16h-6v7h-3v6h-5v-6h-3v-7h-5V9h4z" />
-      <path fill={palette.body} d="M18 7h12v18H18z" />
-      <path fill={palette.light} d="M20 8h8v10h-8z" />
-      <path fill="#f7f3df" d="M20 9h4v4h-4zM27 9h3v4h-3z" />
-      <path fill="#20252a" d="M22 10h2v3h-2zM27 10h2v3h-2z" />
-      <path fill="#f2c63e" d="M21 14h9v4h-9z" />
-      <path fill="#5b3520" d="M24 18h5v3h-5z" />
-      <path fill={palette.tail} d="M18 24h5v9h-5zM23 25h5v13h-5zM28 24h4v9h-4z" />
     </svg>
   );
 }
@@ -74,13 +110,13 @@ function App() {
   const batTimeoutRef = useRef(0);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem('mateus-dev-theme');
-    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+    if (THEMES.includes(savedTheme)) return savedTheme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
+    document.documentElement.style.colorScheme = theme === 'light' ? 'light' : 'dark';
     window.localStorage.setItem('mateus-dev-theme', theme);
   }, [theme]);
 
@@ -97,30 +133,40 @@ function App() {
     setIsCoffeeModalOpen(false);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
+  const changeTheme = useCallback((nextTheme) => {
+    if (!THEMES.includes(nextTheme) || nextTheme === theme) return;
+
     window.clearTimeout(transitionTimeoutRef.current);
     window.clearTimeout(batTimeoutRef.current);
-    setThemeTransition({ kind: nextTheme === 'light' ? 'sun' : 'moon', id: Date.now() });
+    setThemeTransition({
+      kind: nextTheme === 'light' ? 'sun' : nextTheme === 'dark' ? 'moon' : nextTheme,
+      id: Date.now(),
+    });
 
-    const flockKind = nextTheme === 'dark' ? 'bat' : 'parrot';
-    const bats = Array.from({ length: 9 }, (_, index) => ({
+    const flockKind = nextTheme === 'light' ? 'parrot' : nextTheme === 'dark' ? 'bat' : null;
+    const flyers = flockKind ? Array.from({ length: 9 }, (_, index) => ({
         id: `${Date.now()}-${index}`,
         startX: 4 + Math.random() * 88,
         middleX: 4 + Math.random() * 88,
         endX: -8 + Math.random() * 116,
-        size: 34 + Math.random() * 28,
+        size: flockKind === 'parrot' ? 48 + Math.random() * 34 : 34 + Math.random() * 28,
         delay: Math.random() * 480,
         duration: 3000 + Math.random() * 3000,
         facing: Math.random() > 0.5 ? 1 : -1,
-        flapSpeed: 180 + Math.random() * 80,
-        variant: index % 3,
-    }));
+        flapSpeed: flockKind === 'parrot'
+          ? 210 + Math.random() * 100
+          : 180 + Math.random() * 80,
+        variant: index % 5,
+    })) : [];
 
-    const swarmId = Date.now();
-    setBatSwarm({ id: swarmId, kind: flockKind, bats });
-    const swarmLifetime = Math.max(...bats.map((bat) => bat.delay + bat.duration)) + 120;
-    batTimeoutRef.current = window.setTimeout(() => setBatSwarm(null), swarmLifetime);
+    if (flockKind) {
+      const swarmId = Date.now();
+      setBatSwarm({ id: swarmId, kind: flockKind, bats: flyers });
+      const swarmLifetime = Math.max(...flyers.map((flyer) => flyer.delay + flyer.duration)) + 120;
+      batTimeoutRef.current = window.setTimeout(() => setBatSwarm(null), swarmLifetime);
+    } else {
+      setBatSwarm(null);
+    }
 
     setTheme(nextTheme);
     transitionTimeoutRef.current = window.setTimeout(() => setThemeTransition(null), 1300);
@@ -128,11 +174,11 @@ function App() {
 
   return (
     <>
-      <InteractiveGrid />
+      <InteractiveGrid theme={theme} />
       {themeTransition && (
         <div className={`theme-rise theme-rise--${themeTransition.kind}`} key={themeTransition.id} aria-hidden="true">
           <div className="theme-rise__orb">
-            <Icon name={themeTransition.kind} size={76} />
+            <Icon name={themeTransition.kind === 'nether' ? 'flame' : themeTransition.kind} size={76} />
           </div>
         </div>
       )}
@@ -163,7 +209,7 @@ function App() {
         </div>
       )}
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
-      <Header onOpenCoffeeModal={openCoffeeModal} theme={theme} onToggleTheme={toggleTheme} />
+      <Header onOpenCoffeeModal={openCoffeeModal} theme={theme} onThemeChange={changeTheme} />
       <main className="page-shell" id="conteudo">
         <Hero onOpenCoffeeModal={openCoffeeModal} />
         <About />

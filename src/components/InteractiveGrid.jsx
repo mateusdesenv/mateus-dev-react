@@ -4,7 +4,14 @@ const CELL_SIZE = 24;
 const TRAIL_RADIUS = 2;
 const FADE_PER_SECOND = 1.8;
 
-function InteractiveGrid() {
+const themeGridColors = {
+  light: '47, 184, 65',
+  dark: '47, 184, 65',
+  nether: '238, 69, 43',
+  end: '171, 83, 255',
+};
+
+function InteractiveGrid({ theme = 'light' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -48,7 +55,7 @@ function InteractiveGrid() {
         activeCells.set(key, nextIntensity);
         const [column, row] = key.split(':').map(Number);
         const alpha = 0.08 + nextIntensity * 0.48;
-        context.fillStyle = `rgba(47, 184, 65, ${alpha})`;
+        context.fillStyle = `rgba(${themeGridColors[theme] || themeGridColors.light}, ${alpha})`;
         context.fillRect(
           column * CELL_SIZE + 1,
           row * CELL_SIZE + 1,
@@ -98,7 +105,7 @@ function InteractiveGrid() {
       window.removeEventListener('pointermove', handlePointerMove);
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
-  }, []);
+  }, [theme]);
 
   return <canvas ref={canvasRef} className="interactive-grid" aria-hidden="true" />;
 }
