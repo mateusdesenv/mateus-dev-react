@@ -2869,11 +2869,11 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   align-items: center;
   gap: 9px;
   border: 2px solid;
-  border-color: var(--retro-border-light) var(--retro-border-dark) var(--retro-border-dark) var(--retro-border-light);
+  border-color: #8bd17a #1b6118 #1b6118 #8bd17a;
   border-radius: 2px;
-  color: var(--text);
-  background: var(--surface);
-  box-shadow: 0 4px 0 var(--retro-shadow);
+  color: #f7fff2;
+  background: var(--retro-green);
+  box-shadow: 0 4px 0 var(--retro-green-dark), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
   font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
   font-size: 11px;
   font-weight: 900;
@@ -2890,7 +2890,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 
 .character-control:active {
   translate: 0 3px;
-  box-shadow: 0 1px 0 var(--retro-shadow);
+  box-shadow: 0 1px 0 var(--retro-green-dark);
 }
 
 .character-control[aria-pressed="true"] {
@@ -2898,6 +2898,10 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   color: #fff8f4;
   background: #bd3329;
   box-shadow: 0 4px 0 #711b16, inset 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.character-control[aria-pressed="true"]:active {
+  box-shadow: 0 1px 0 #711b16;
 }
 
 .character-control__keys {
