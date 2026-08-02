@@ -1667,29 +1667,33 @@ textarea:focus-visible {
 @keyframes bat-swarm-flight {
   0% {
     opacity: 0;
-    transform: translate3d(var(--bat-start-x), calc(100vh + 70px), 0) rotate(-8deg);
+    transform: translate3d(var(--flight-x-0), var(--flight-y-0), 0) rotate(var(--flight-rotate-0));
   }
 
-  8% {
+  6% {
     opacity: 1;
   }
 
-  34% {
-    transform: translate3d(var(--bat-middle-x), 66vh, 0) rotate(9deg);
+  24% {
+    transform: translate3d(var(--flight-x-1), var(--flight-y-1), 0) rotate(var(--flight-rotate-1));
   }
 
-  64% {
+  49% {
+    transform: translate3d(var(--flight-x-2), var(--flight-y-2), 0) rotate(var(--flight-rotate-2));
+  }
+
+  73% {
     opacity: 1;
-    transform: translate3d(var(--bat-start-x), 31vh, 0) rotate(-7deg);
+    transform: translate3d(var(--flight-x-3), var(--flight-y-3), 0) rotate(var(--flight-rotate-3));
   }
 
-  88% {
+  94% {
     opacity: 1;
   }
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--bat-end-x), -90px, 0) rotate(10deg);
+    transform: translate3d(var(--flight-x-4), var(--flight-y-4), 0) rotate(var(--flight-rotate-4));
   }
 }
 
@@ -1762,8 +1766,16 @@ textarea:focus-visible {
   left: 0;
   width: var(--bat-size);
   opacity: 0;
-  animation: bat-swarm-flight var(--bat-duration) cubic-bezier(0.36, 0.08, 0.52, 0.96) var(--bat-delay) both;
+  animation: bat-swarm-flight var(--bat-duration) linear var(--bat-delay) both;
   will-change: transform, opacity;
+}
+
+.bat-swarm--bat .bat-swarm__flyer {
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.bat-swarm--parrot .bat-swarm__flyer {
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
 .bat-swarm__bat {
@@ -2873,6 +2885,29 @@ html[data-theme="end"] body {
   }
 }
 
+@keyframes slime-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.08, 0.88);
+  }
+
+  16% {
+    transform: translateY(-5px) scale(0.94, 1.08);
+  }
+
+  46% {
+    transform: translateY(-18px) scale(1, 1);
+  }
+
+  72% {
+    transform: translateY(-8px) scale(1.02, 0.98);
+  }
+
+  88% {
+    transform: translateY(0) scale(0.94, 1.08);
+  }
+}
+
 @keyframes creeper-leg-front {
   0%,
   100% {
@@ -3675,6 +3710,28 @@ html[data-theme="end"] body {
   animation-duration: 140ms;
 }
 
+.creeper-mascot--steve-jumping .creeper-mascot__steve-sprite,
+.creeper-mascot--steve-jumping .creeper-mascot__steve-arm,
+.creeper-mascot--steve-jumping .creeper-mascot__steve-leg {
+  animation: none;
+}
+
+.creeper-mascot--steve-jumping .creeper-mascot__steve-arm--front {
+  transform: rotate(-34deg);
+}
+
+.creeper-mascot--steve-jumping .creeper-mascot__steve-arm--back {
+  transform: rotate(34deg);
+}
+
+.creeper-mascot--steve-jumping .creeper-mascot__steve-leg--front {
+  transform: rotate(11deg);
+}
+
+.creeper-mascot--steve-jumping .creeper-mascot__steve-leg--back {
+  transform: rotate(-11deg);
+}
+
 .creeper-mascot__steve {
   position: absolute;
   z-index: 2;
@@ -3751,6 +3808,16 @@ html[data-theme="end"] body {
 
 .creeper-mascot__sprite--pigman {
   filter: drop-shadow(4px 4px 0 rgba(43, 24, 22, 0.48));
+}
+
+.creeper-mascot__sprite--slime {
+  filter: drop-shadow(4px 4px 0 rgba(14, 54, 23, 0.46));
+  transform-origin: center bottom;
+  animation: slime-hop 760ms steps(2, end) infinite;
+}
+
+.creeper-mascot--mob-slime .creeper-mascot__walker {
+  animation: none;
 }
 
 .creeper-mascot__sprite--enderman {

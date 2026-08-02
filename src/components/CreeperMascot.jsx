@@ -10,6 +10,8 @@ const STEVE_SPEED = 82;
 const STEVE_ESCAPE_SPEED = 148;
 const STEVE_MANUAL_SPEED = 190;
 const STEVE_MANUAL_SPRINT_SPEED = 310;
+const STEVE_JUMP_VELOCITY = 430;
+const STEVE_JUMP_GRAVITY = 1150;
 const DIAMOND_SIZE = 32;
 const DIAMOND_MIN_DISTANCE = 150;
 const STEVE_DANGER_RANGE = 180;
@@ -38,6 +40,7 @@ const MOBS = [
   { id: 'spider', label: 'Aranha' },
   { id: 'spiderJockey', label: 'Spider Jockey' },
   { id: 'pigman', label: 'Zombie Pigman' },
+  { id: 'slime', label: 'Slime' },
   { id: 'enderman', label: 'Enderman' },
 ];
 
@@ -239,6 +242,18 @@ function CharacterSkin({ skin }) {
 }
 
 function MobDockIcon({ mob }) {
+  if (mob === 'slime') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
+        <path fill="#286b31" d="M1 2h14v13H1z" />
+        <path fill="#59b858" d="M2 3h12v11H2z" />
+        <path fill="#83d675" d="M3 4h8v3H3z" />
+        <path fill="#b4ed9d" d="M3 4h4v2H3z" />
+        <path fill="#173c20" d="M4 7h3v3H4zM10 7h3v3h-3zM6 11h5v2H6z" />
+      </svg>
+    );
+  }
+
   if (mob === 'enderman') {
     return (
       <svg viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
@@ -387,6 +402,7 @@ function CreeperMascot() {
   const [isManualControl, setIsManualControl] = useState(false);
   const [isSteveMoving, setIsSteveMoving] = useState(true);
   const [isSteveSprinting, setIsSteveSprinting] = useState(false);
+  const [isSteveJumping, setIsSteveJumping] = useState(false);
   const [diamond, setDiamond] = useState(null);
   const [diamondCount, setDiamondCount] = useState(0);
   const [status, setStatus] = useState('walking');
@@ -423,6 +439,9 @@ function CreeperMascot() {
   const pressedKeysRef = useRef(new Set());
   const steveMovingRef = useRef(true);
   const steveSprintingRef = useRef(false);
+  const steveJumpingRef = useRef(false);
+  const steveJumpVelocityRef = useRef(0);
+  const steveJumpBaseYRef = useRef(0);
   const diamondRef = useRef(null);
   const diamondCountRef = useRef(0);
   const creeperPositionRef = useRef(12);
@@ -506,9 +525,12 @@ function CreeperMascot() {
             - (pressedKeysRef.current.has('a') ? 1 : 0);
           const verticalInput = (pressedKeysRef.current.has('w') ? 1 : 0)
             - (pressedKeysRef.current.has('s') ? 1 : 0);
-          const isMoving = horizontalInput !== 0 || verticalInput !== 0;
-          const isSprinting = isMoving && pressedKeysRef.current.has('control');
-          const diagonalScale = horizontalInput !== 0 && verticalInput !== 0 ? Math.SQRT1_2 : 1;
+          const isJumping = steveJumpingRef.current;
+          const effectiveVerticalInput = isJumping ? 0 : verticalInput;
+          const hasDirectionalInput = horizontalInput !== 0 || effectiveVerticalInput !== 0;
+          const isMoving = hasDirectionalInput || isJumping;
+          const isSprinting = hasDirectionalInput && pressedKeysRef.current.has('control');
+          const diagonalScale = horizontalInput !== 0 && effectiveVerticalInput !== 0 ? Math.SQRT1_2 : 1;
           const manualSpeed = isSprinting ? STEVE_MANUAL_SPRINT_SPEED : STEVE_MANUAL_SPEED;
 
           if (isMoving !== steveMovingRef.current) {
@@ -531,13 +553,35 @@ function CreeperMascot() {
 
           nextSteveX += horizontalInput * manualSpeed * diagonalScale * elapsed;
           const maxVerticalPosition = Math.max(0, window.innerHeight - 118);
-          steveVerticalPositionRef.current = Math.max(
-            0,
-            Math.min(
-              maxVerticalPosition,
-              steveVerticalPositionRef.current + verticalInput * manualSpeed * diagonalScale * elapsed,
-            ),
-          );
+
+          if (isJumping) {
+            steveJumpVelocityRef.current -= STEVE_JUMP_GRAVITY * elapsed;
+            const nextVerticalPosition = steveVerticalPositionRef.current
+              + steveJumpVelocityRef.current * elapsed;
+
+            if (nextVerticalPosition >= maxVerticalPosition) {
+              steveVerticalPositionRef.current = maxVerticalPosition;
+              steveJumpVelocityRef.current = Math.min(0, steveJumpVelocityRef.current);
+            } else if (
+              steveJumpVelocityRef.current <= 0
+              && nextVerticalPosition <= steveJumpBaseYRef.current
+            ) {
+              steveVerticalPositionRef.current = steveJumpBaseYRef.current;
+              steveJumpVelocityRef.current = 0;
+              steveJumpingRef.current = false;
+              setIsSteveJumping(false);
+            } else {
+              steveVerticalPositionRef.current = Math.max(0, nextVerticalPosition);
+            }
+          } else {
+            steveVerticalPositionRef.current = Math.max(
+              0,
+              Math.min(
+                maxVerticalPosition,
+                steveVerticalPositionRef.current + effectiveVerticalInput * manualSpeed * diagonalScale * elapsed,
+              ),
+            );
+          }
         } else {
           const steveSpeed = statusRef.current === 'walking' ? STEVE_SPEED : STEVE_ESCAPE_SPEED;
           nextSteveX += (steveDirectionRef.current === 'right' ? 1 : -1) * steveSpeed * elapsed;
@@ -744,16 +788,26 @@ function CreeperMascot() {
       if (!manualControlRef.current || event.repeat) return;
       if (interactiveTags.has(event.target.tagName) || event.target.isContentEditable) return;
 
-      const key = event.key.toLowerCase();
-      if (!['w', 'a', 's', 'd', 'control'].includes(key)) return;
+      const key = event.code === 'Space' ? 'space' : event.key.toLowerCase();
+      if (!['w', 'a', 's', 'd', 'control', 'space'].includes(key)) return;
 
       event.preventDefault();
+      if (key === 'space') {
+        if (!steveJumpingRef.current) {
+          steveJumpBaseYRef.current = steveVerticalPositionRef.current;
+          steveJumpVelocityRef.current = STEVE_JUMP_VELOCITY;
+          steveJumpingRef.current = true;
+          setIsSteveJumping(true);
+        }
+        return;
+      }
+
       pressedKeysRef.current.add(key);
     };
 
     const handleKeyUp = (event) => {
-      const key = event.key.toLowerCase();
-      if (!['w', 'a', 's', 'd', 'control'].includes(key)) return;
+      const key = event.code === 'Space' ? 'space' : event.key.toLowerCase();
+      if (!['w', 'a', 's', 'd', 'control', 'space'].includes(key)) return;
       pressedKeysRef.current.delete(key);
     };
 
@@ -984,8 +1038,12 @@ function CreeperMascot() {
     pressedKeysRef.current.clear();
     steveMovingRef.current = !nextManualControl;
     steveSprintingRef.current = false;
+    steveJumpingRef.current = false;
+    steveJumpVelocityRef.current = 0;
+    steveJumpBaseYRef.current = steveVerticalPositionRef.current;
     setIsSteveMoving(!nextManualControl);
     setIsSteveSprinting(false);
+    setIsSteveJumping(false);
 
     if (nextManualControl) {
       const nextDiamond = createRandomDiamond(
@@ -1020,6 +1078,9 @@ function CreeperMascot() {
     creeperDirectionRef.current = 'right';
     lastDirectionChangeRef.current = 0;
     statusRef.current = 'walking';
+    steveJumpingRef.current = false;
+    steveJumpVelocityRef.current = 0;
+    steveJumpBaseYRef.current = 0;
 
     diamondCountRef.current = 0;
     setDiamondCount(0);
@@ -1037,6 +1098,7 @@ function CreeperMascot() {
     steveSprintingRef.current = false;
     setIsSteveMoving(shouldMoveAutomatically);
     setIsSteveSprinting(false);
+    setIsSteveJumping(false);
     setSteveDirection('right');
     setCreeperDirection('right');
     setStatus('walking');
@@ -1050,7 +1112,7 @@ function CreeperMascot() {
   return (
     <div
       ref={mascotRef}
-      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}${isSteveSprinting ? ' creeper-mascot--steve-sprinting' : ''}`}
+      className={`creeper-mascot creeper-mascot--${status} creeper-mascot--mob-${selectedMob} creeper-mascot--facing-${creeperDirection} creeper-mascot--steve-${steveDirection}${isSkeletonShooting ? ' creeper-mascot--skeleton-shooting' : ''}${isEndermanTeleporting ? ' creeper-mascot--enderman-teleporting' : ''}${isEndermanWalking ? ' creeper-mascot--enderman-walking' : ''}${isManualControl ? ' creeper-mascot--manual' : ''}${isSteveMoving ? ' creeper-mascot--steve-moving' : ''}${isSteveSprinting ? ' creeper-mascot--steve-sprinting' : ''}${isSteveJumping ? ' creeper-mascot--steve-jumping' : ''}`}
       style={{ '--creeper-x': '12px', '--creeper-y': '0px', '--steve-x': `${Math.max(64, window.innerWidth - 64)}px`, '--steve-y': '0px' }}
     >
       {status === 'exploded' && (
@@ -1121,7 +1183,7 @@ function CreeperMascot() {
         aria-pressed={isManualControl}
         onClick={toggleCharacterControl}
       >
-        <span className="character-control__keys" aria-hidden="true">WASD + CTRL</span>
+        <span className="character-control__keys" aria-hidden="true">WASD · CTRL · ESPAÇO</span>
         <span>{isManualControl ? 'Parar de controlar personagem' : 'Controlar personagem'}</span>
       </button>
       <nav className="mob-dock skin-dock" aria-label="Escolher skin do personagem">
@@ -1182,6 +1244,24 @@ function CreeperMascot() {
             <path fill="#2c762b" d="M12 88h18v8H12z" />
           </g>
         </svg>}
+        {selectedMob === 'slime' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--slime" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="slime-sprite__body">
+              <path fill="#1d5728" d="M4 30h56v59H4z" />
+              <path fill="#397f3e" d="M7 33h50v53H7z" />
+              <path fill="#58ad50" d="M10 35h44v48H10z" />
+              <path fill="#75c866" d="M12 37h36v39H12z" />
+              <path fill="#94de7a" d="M13 38h25v11H13z" />
+              <path fill="#b8ee9c" d="M14 39h13v6H14z" />
+              <path fill="#4b9847" d="M48 35h6v48h-6zM10 76h44v7H10z" />
+              <path fill="#32773a" d="M16 46h12v13H16zM38 46h12v13H38z" opacity=".72" />
+              <path fill="#14371c" d="M18 48h10v12H18zM39 48h10v12H39z" />
+              <path fill="#0d2514" d="M25 64h20v8H25zM20 61h8v7h-8z" />
+              <path fill="#2b6b34" d="M28 64h14v4H28z" />
+              <path fill="#82d36f" d="M11 55h5v17h-5zM46 65h7v10h-7zM31 38h7v5h-7z" opacity=".78" />
+            </g>
+          </svg>
+        )}
         {selectedMob === 'skeleton' && (
           <svg className="creeper-mascot__sprite creeper-mascot__sprite--skeleton" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
             <g className="mob-sprite__limb mob-sprite__limb--back-arm">

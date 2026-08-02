@@ -102,6 +102,43 @@ function MinecraftParrot({ variant = 0 }) {
   );
 }
 
+const clampFlightValue = (value, min = 7, max = 90) => Math.max(min, Math.min(max, value));
+
+function createFlightRoute(kind) {
+  const movingRight = Math.random() >= 0.5;
+  const startY = 14 + Math.random() * 66;
+  const endY = clampFlightValue(startY + (Math.random() - 0.5) * (kind === 'bat' ? 42 : 28));
+  const deviation = kind === 'bat' ? 19 : 10;
+  const progressX = [
+    -12,
+    14 + Math.random() * 9,
+    40 + Math.random() * 18,
+    71 + Math.random() * 13,
+    112,
+  ];
+  const x = movingRight ? progressX : progressX.map((position) => 100 - position);
+  const y = [
+    startY,
+    clampFlightValue(startY + (endY - startY) * 0.22 + (Math.random() - 0.5) * deviation),
+    clampFlightValue(startY + (endY - startY) * 0.5 + (Math.random() - 0.5) * deviation),
+    clampFlightValue(startY + (endY - startY) * 0.78 + (Math.random() - 0.5) * deviation),
+    endY,
+  ];
+  const rotationScale = kind === 'bat' ? 0.62 : 0.38;
+  const rotationLimit = kind === 'bat' ? 14 : 8;
+  const rotations = y.map((position, index) => {
+    const nextPosition = y[Math.min(index + 1, y.length - 1)];
+    return Math.max(-rotationLimit, Math.min(rotationLimit, (nextPosition - position) * rotationScale));
+  });
+
+  return {
+    routeX: x,
+    routeY: y,
+    rotations,
+    facing: movingRight ? -1 : 1,
+  };
+}
+
 function App() {
   const [isCoffeeModalOpen, setIsCoffeeModalOpen] = useState(false);
   const [themeTransition, setThemeTransition] = useState(null);
@@ -146,13 +183,12 @@ function App() {
     const flockKind = nextTheme === 'light' ? 'parrot' : nextTheme === 'dark' ? 'bat' : null;
     const flyers = flockKind ? Array.from({ length: 9 }, (_, index) => ({
         id: `${Date.now()}-${index}`,
-        startX: 4 + Math.random() * 88,
-        middleX: 4 + Math.random() * 88,
-        endX: -8 + Math.random() * 116,
+        ...createFlightRoute(flockKind),
         size: flockKind === 'parrot' ? 48 + Math.random() * 34 : 34 + Math.random() * 28,
-        delay: Math.random() * 480,
-        duration: 3000 + Math.random() * 3000,
-        facing: Math.random() > 0.5 ? 1 : -1,
+        delay: Math.random() * 680,
+        duration: flockKind === 'parrot'
+          ? 4200 + Math.random() * 1800
+          : 3000 + Math.random() * 2400,
         flapSpeed: flockKind === 'parrot'
           ? 210 + Math.random() * 100
           : 180 + Math.random() * 80,
@@ -189,9 +225,21 @@ function App() {
               className="bat-swarm__flyer"
               key={bat.id}
               style={{
-                '--bat-start-x': `${bat.startX}vw`,
-                '--bat-middle-x': `${bat.middleX}vw`,
-                '--bat-end-x': `${bat.endX}vw`,
+                '--flight-x-0': `${bat.routeX[0]}vw`,
+                '--flight-x-1': `${bat.routeX[1]}vw`,
+                '--flight-x-2': `${bat.routeX[2]}vw`,
+                '--flight-x-3': `${bat.routeX[3]}vw`,
+                '--flight-x-4': `${bat.routeX[4]}vw`,
+                '--flight-y-0': `${bat.routeY[0]}vh`,
+                '--flight-y-1': `${bat.routeY[1]}vh`,
+                '--flight-y-2': `${bat.routeY[2]}vh`,
+                '--flight-y-3': `${bat.routeY[3]}vh`,
+                '--flight-y-4': `${bat.routeY[4]}vh`,
+                '--flight-rotate-0': `${bat.rotations[0]}deg`,
+                '--flight-rotate-1': `${bat.rotations[1]}deg`,
+                '--flight-rotate-2': `${bat.rotations[2]}deg`,
+                '--flight-rotate-3': `${bat.rotations[3]}deg`,
+                '--flight-rotate-4': `${bat.rotations[4]}deg`,
                 '--bat-size': `${bat.size}px`,
                 '--bat-delay': `${bat.delay}ms`,
                 '--bat-duration': `${bat.duration}ms`,
