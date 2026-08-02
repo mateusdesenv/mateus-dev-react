@@ -48,7 +48,7 @@ const SKINS = [
 
 const SKIN_COLORS = {
   technoblade: { skin: '#ef9c91', skinLight: '#ffc0b3', hair: '#d86673', shirt: '#a71f32', shirtLight: '#d43743', shirtDark: '#681522', pants: '#26252e', boots: '#111117' },
-  viniccius13: { skin: '#b96f4f', skinLight: '#df956d', hair: '#34251f', shirt: '#d46f22', shirtLight: '#f39a35', shirtDark: '#78411e', pants: '#303742', boots: '#171a20' },
+  viniccius13: { skin: '#d19a68', skinLight: '#edb77d', hair: '#111213', shirt: '#d90d15', shirtLight: '#f21a20', shirtDark: '#7d080d', pants: '#11131d', boots: '#49171b' },
   daviGamer: { skin: '#9f5e3f', skinLight: '#ca825d', hair: '#32180c', shirt: '#07183a', shirtLight: '#0a4f9d', shirtDark: '#020817', pants: '#071022', boots: '#02040a' },
   authenticGames: { skin: '#bb7353', skinLight: '#df9870', hair: '#251c1a', shirt: '#bd2930', shirtLight: '#eb4547', shirtDark: '#6e1a21', pants: '#292a31', boots: '#121319' },
   leon: { skin: '#bd7959', skinLight: '#dfa07a', hair: '#4b3024', shirt: '#236f85', shirtLight: '#3693a5', shirtDark: '#174857', pants: '#39434c', boots: '#1c2228' },
@@ -74,7 +74,9 @@ function SkinDockIcon({ skin }) {
       {isTechno && <path fill="#9d4e51" d="M6 10h5v3H6zM5 11h1v2H5zM11 11h1v2h-1z" />}
       {skin === 'leon' && <path fill="#34241f" d="M3 6h5v4H3zM9 6h5v4H9zM7 7h3v1H7zM5 11h7v3H5z" fillOpacity=".8" />}
       {skin === 'authenticGames' && <path fill="#fff" d="M3 13h10v2H3z" />}
-      {skin === 'viniccius13' && <path fill="#f5c433" d="M2 13h12v2H2z" />}
+      {skin === 'viniccius13' && <path fill="#f5f3eb" d="M5 9h7v4H5z" />}
+      {skin === 'viniccius13' && <path fill="#111217" d="M2 4h2v8H2zM13 4h2v8h-2zM12 10h4v2h-4zM7 13h4v2H7z" />}
+      {skin === 'viniccius13' && <path fill="#e7131b" d="M2 13h12v2H2z" />}
       {skin === 'daviGamer' && <path fill="#f4f2eb" d="M3 12h10v3H3z" />}
       {skin === 'daviGamer' && <path fill="#0b60bc" d="M7 12h3v3H7z" />}
       {skin === 'edukof' && <path fill="#ffd83d" d="M7 3h4L9 7h3l-6 7 2-5H5z" />}
@@ -116,6 +118,10 @@ function CharacterSkin({ skin }) {
             <path fill="#f8f4eb" d="M14 14h8v5h-8zM27 14h7v5h-7z" />
             <path fill={skin === 'venomExtreme' ? '#63d64c' : '#3c7187'} d="M19 14h3v5h-3zM27 14h3v5h-3z" />
             <path fill="#744331" d="M20 24h10v3H20z" />
+            {skin === 'viniccius13' && <path fill="#eeeee9" d="M16 19h18v11H16z" />}
+            {skin === 'viniccius13' && <path fill="#101116" d="M19 14h3v5h-3zM27 14h3v5h-3zM21 29h10v4H21z" />}
+            {skin === 'viniccius13' && <path fill="#f1f0eb" d="M8 4h4V1h25v3h4v20h-3V7h-3V4H14v3h-3v17H8z" />}
+            {skin === 'viniccius13' && <path fill="#111217" d="M10 7h3v16h-3zM37 7h3v16h-3zM34 20h11v4H34zM42 23h3v4h-3z" />}
             {skin === 'leon' && <path fill="#3e2a22" d="M12 12h12v9H12zM25 12h12v9H25zM22 15h5v2h-5zM17 23h17v8H17z" fillOpacity=".72" />}
             {skin === 'venomExtreme' && <path fill="#0b1210" d="M10 4h28v9H10zM10 9h7v20h-7zM31 9h7v20h-7z" fillOpacity=".82" />}
             {skin === 'daviGamer' && <path fill="#1d0d07" d="M10 4h28v5H10zM13 8h6v4h-6zM29 7h9v5h-9z" />}
@@ -135,7 +141,8 @@ function CharacterSkin({ skin }) {
       <path fill={colors.shirtLight} d="M14 34h6v25h-6z" />
       <path fill={colors.shirtDark} d="M30 34h4v25h-4zM14 56h20v4H14z" />
       {skin === 'technoblade' && <path fill="#efc43b" d="M22 34h5v22h-5zM14 39h20v4H14z" />}
-      {skin === 'viniccius13' && <path fill="#ffe56b" d="M20 39h9v3h-5v4h5v8h-9v-3h5v-3h-5z" />}
+      {skin === 'viniccius13' && <path fill="#120b0d" d="M16 38h5v9h3v4h3v-4h3v-9h5v19h-5v-5h-3v5h-6v-5h-3v5h-5V38z" />}
+      {skin === 'viniccius13' && <path fill="#ff3035" d="M14 34h20v4H14z" />}
       {skin === 'daviGamer' && <path fill="#f0eee7" d="M18 34h12v22H18zM14 34h6v8h-6zM28 34h6v8h-6z" />}
       {skin === 'daviGamer' && <path fill="#0a57ac" d="M22 35h5v5h-5zM23 40h4v13h-4zM18 53h12v4H18z" />}
       {skin === 'daviGamer' && <path fill="#020817" d="M14 42h5v17h-5zM29 42h5v17h-5z" />}

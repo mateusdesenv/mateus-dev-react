@@ -1633,6 +1633,118 @@ textarea:focus-visible {
   }
 }
 
+@keyframes bat-swarm-flight {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--bat-start-x), calc(100vh + 70px), 0) rotate(-8deg);
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  34% {
+    transform: translate3d(var(--bat-middle-x), 66vh, 0) rotate(9deg);
+  }
+
+  64% {
+    opacity: 1;
+    transform: translate3d(var(--bat-start-x), 31vh, 0) rotate(-7deg);
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--bat-end-x), -90px, 0) rotate(10deg);
+  }
+}
+
+@keyframes bat-wing-left {
+  0%,
+  100% {
+    transform: translateY(-2px) rotate(-18deg) scaleY(1);
+  }
+
+  50% {
+    transform: translateY(4px) rotate(42deg) scaleY(0.18);
+  }
+}
+
+@keyframes bat-wing-right {
+  0%,
+  100% {
+    transform: translateY(-2px) rotate(18deg) scaleY(1);
+  }
+
+  50% {
+    transform: translateY(4px) rotate(-42deg) scaleY(0.18);
+  }
+}
+
+.bat-swarm {
+  position: fixed;
+  inset: 0;
+  z-index: 990;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bat-swarm__flyer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--bat-size);
+  opacity: 0;
+  animation: bat-swarm-flight var(--bat-duration) cubic-bezier(0.36, 0.08, 0.52, 0.96) var(--bat-delay) both;
+  will-change: transform, opacity;
+}
+
+.bat-swarm__bat {
+  display: block;
+  filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.34));
+  transform: scaleX(var(--bat-facing));
+  transform-origin: center;
+}
+
+.bat-swarm__bat--parrot {
+  filter: drop-shadow(3px 4px 0 rgba(58, 75, 38, 0.28));
+}
+
+.bat-swarm__bat svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+.bat-swarm__wing {
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation-duration: var(--bat-flap-speed);
+  animation-timing-function: steps(2, jump-none);
+  animation-iteration-count: infinite;
+}
+
+.bat-swarm__wing--left {
+  transform-origin: right center;
+  animation-name: bat-wing-left;
+}
+
+.bat-swarm__wing--right {
+  transform-origin: left center;
+  animation-name: bat-wing-right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bat-swarm {
+    display: none;
+  }
+}
+
 .mobile-menu-intro,
 .nav-index,
 .nav-arrow {
@@ -2770,13 +2882,6 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 .skin-dock {
   right: auto;
   left: 14px;
-  max-height: calc(100vh - 32px);
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.skin-dock::-webkit-scrollbar {
-  display: none;
 }
 
 .skin-dock .mob-dock__button {
@@ -2784,6 +2889,7 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
 }
 
 .skin-dock .mob-dock__button > span {
+  z-index: 10;
   right: auto;
   left: calc(100% + 12px);
   transform: translate(-8px, -50%);
@@ -3398,7 +3504,6 @@ html[data-theme="dark"] .site-nav.is-open button:hover {
   .skin-dock {
     right: auto;
     left: 8px;
-    max-height: calc(100vh - 104px);
   }
 
   .mob-dock__button {
