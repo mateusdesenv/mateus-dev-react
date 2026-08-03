@@ -511,7 +511,7 @@ function MobDockIcon({ mob }) {
   );
 }
 
-function EnderDragon() {
+export function EnderDragon() {
   return (
     <svg viewBox="0 0 192 96" role="presentation" shapeRendering="crispEdges">
       <g className="ender-dragon__wing ender-dragon__wing--back">

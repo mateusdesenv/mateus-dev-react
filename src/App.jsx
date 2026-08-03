@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import About from './components/About';
 import CoffeeModal from './components/CoffeeModal';
 import Contact from './components/Contact';
-import CreeperMascot from './components/CreeperMascot';
+import CreeperMascot, { EnderDragon } from './components/CreeperMascot';
 import Education from './components/Education';
 import Experience from './components/Experience';
 import Header from './components/Header';
@@ -102,13 +102,30 @@ function MinecraftParrot({ variant = 0 }) {
   );
 }
 
+function MinecraftGhast() {
+  return (
+    <svg viewBox="0 0 72 92" role="presentation" shapeRendering="crispEdges">
+      <path fill="#c9c9c9" d="M8 8h56v48H8z" />
+      <path fill="#f3f3f3" d="M8 8h48v8H16v32h48v8H8z" />
+      <path fill="#dedede" d="M16 16h48v32H16z" />
+      <path fill="#b5b5b5" d="M56 16h8v40h-8zM16 48h40v8H16z" />
+      <path fill="#777" d="M16 32h12v8H16zM44 32h12v8H44z" />
+      <path fill="#2a2025" d="M20 32h8v8h-8zM44 32h8v8h-8zM28 44h16v8H28z" />
+      <g className="minecraft-ghast__tentacles">
+        <path fill="#d7d7d7" d="M12 56h8v24h-8zM28 56h8v32h-8zM44 56h8v24h-8zM56 56h8v32h-8z" />
+        <path fill="#aaa" d="M12 72h8v8h-8zM28 80h8v8h-8zM44 72h8v8h-8zM56 80h8v8h-8z" />
+      </g>
+    </svg>
+  );
+}
+
 const clampFlightValue = (value, min = 7, max = 90) => Math.max(min, Math.min(max, value));
 
 function createFlightRoute(kind) {
-  const movingRight = Math.random() >= 0.5;
-  const startY = 14 + Math.random() * 66;
-  const endY = clampFlightValue(startY + (Math.random() - 0.5) * (kind === 'bat' ? 42 : 28));
-  const deviation = kind === 'bat' ? 19 : 10;
+  const movingRight = kind === 'ghast' || kind === 'dragon' || Math.random() >= 0.5;
+  const startY = kind === 'dragon' ? 12 + Math.random() * 28 : 14 + Math.random() * 66;
+  const endY = clampFlightValue(startY + (Math.random() - 0.5) * (kind === 'bat' ? 42 : kind === 'ghast' || kind === 'dragon' ? 8 : 28));
+  const deviation = kind === 'bat' ? 19 : kind === 'ghast' || kind === 'dragon' ? 4 : 10;
   const progressX = [
     -12,
     14 + Math.random() * 9,
@@ -124,8 +141,8 @@ function createFlightRoute(kind) {
     clampFlightValue(startY + (endY - startY) * 0.78 + (Math.random() - 0.5) * deviation),
     endY,
   ];
-  const rotationScale = kind === 'bat' ? 0.62 : 0.38;
-  const rotationLimit = kind === 'bat' ? 14 : 8;
+  const rotationScale = kind === 'bat' ? 0.62 : kind === 'ghast' || kind === 'dragon' ? 0.12 : 0.38;
+  const rotationLimit = kind === 'bat' ? 14 : kind === 'ghast' || kind === 'dragon' ? 2 : 8;
   const rotations = y.map((position, index) => {
     const nextPosition = y[Math.min(index + 1, y.length - 1)];
     return Math.max(-rotationLimit, Math.min(rotationLimit, (nextPosition - position) * rotationScale));
@@ -135,7 +152,7 @@ function createFlightRoute(kind) {
     routeX: x,
     routeY: y,
     rotations,
-    facing: movingRight ? -1 : 1,
+    facing: kind === 'dragon' ? 1 : movingRight ? -1 : 1,
   };
 }
 
@@ -180,17 +197,25 @@ function App() {
       id: Date.now(),
     });
 
-    const flockKind = nextTheme === 'light' ? 'parrot' : nextTheme === 'dark' ? 'bat' : null;
-    const flyers = flockKind ? Array.from({ length: 9 }, (_, index) => ({
+    const flockKind = nextTheme === 'light' ? 'parrot' : nextTheme === 'dark' ? 'bat' : nextTheme === 'nether' ? 'ghast' : nextTheme === 'end' ? 'dragon' : null;
+    const flyers = flockKind ? Array.from({ length: flockKind === 'ghast' || flockKind === 'dragon' ? 1 : 9 }, (_, index) => ({
         id: `${Date.now()}-${index}`,
         ...createFlightRoute(flockKind),
-        size: flockKind === 'parrot' ? 48 + Math.random() * 34 : 34 + Math.random() * 28,
-        delay: Math.random() * 680,
+        size: flockKind === 'parrot' ? 48 + Math.random() * 34 : flockKind === 'ghast' ? 96 : flockKind === 'dragon' ? 210 : 34 + Math.random() * 28,
+        delay: flockKind === 'ghast' || flockKind === 'dragon' ? 180 : Math.random() * 680,
         duration: flockKind === 'parrot'
           ? 4200 + Math.random() * 1800
+          : flockKind === 'ghast'
+            ? 7200
+          : flockKind === 'dragon'
+            ? 6800
           : 3000 + Math.random() * 2400,
         flapSpeed: flockKind === 'parrot'
           ? 210 + Math.random() * 100
+          : flockKind === 'ghast'
+            ? 620
+          : flockKind === 'dragon'
+            ? 560
           : 180 + Math.random() * 80,
         variant: index % 5,
     })) : [];
@@ -248,9 +273,10 @@ function App() {
               }}
             >
               <span className={`bat-swarm__bat bat-swarm__bat--${batSwarm.kind}`}>
-                {batSwarm.kind === 'bat'
-                  ? <MinecraftBat />
-                  : <MinecraftParrot variant={bat.variant} />}
+                {batSwarm.kind === 'bat' && <MinecraftBat />}
+                {batSwarm.kind === 'parrot' && <MinecraftParrot variant={bat.variant} />}
+                {batSwarm.kind === 'ghast' && <MinecraftGhast />}
+                {batSwarm.kind === 'dragon' && <EnderDragon />}
               </span>
             </span>
           ))}

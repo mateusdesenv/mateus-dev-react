@@ -1761,6 +1761,17 @@ textarea:focus-visible {
   }
 }
 
+@keyframes ghast-tentacles-float {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+
+  50% {
+    transform: translateY(4px);
+  }
+}
+
 .bat-swarm {
   position: fixed;
   inset: 0;
@@ -1787,6 +1798,14 @@ textarea:focus-visible {
   animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
+.bat-swarm--ghast .bat-swarm__flyer {
+  animation-timing-function: linear;
+}
+
+.bat-swarm--dragon .bat-swarm__flyer {
+  animation-timing-function: linear;
+}
+
 .bat-swarm__bat {
   display: block;
   filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.34));
@@ -1796,6 +1815,28 @@ textarea:focus-visible {
 
 .bat-swarm__bat--parrot {
   filter: drop-shadow(3px 4px 0 rgba(58, 75, 38, 0.28));
+}
+
+.bat-swarm__bat--ghast {
+  filter:
+    drop-shadow(5px 6px 0 rgba(50, 2, 3, 0.42))
+    drop-shadow(0 0 10px rgba(255, 92, 38, 0.24));
+}
+
+.bat-swarm__bat--dragon {
+  filter:
+    drop-shadow(6px 7px 0 rgba(18, 5, 24, 0.5))
+    drop-shadow(0 0 12px rgba(195, 83, 255, 0.3));
+}
+
+.bat-swarm__bat--dragon .ender-dragon__wing {
+  animation-duration: 560ms;
+}
+
+.minecraft-ghast__tentacles {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: ghast-tentacles-float var(--bat-flap-speed) steps(2, jump-none) infinite;
 }
 
 .bat-swarm__bat--parrot .bat-swarm__wing--left {
