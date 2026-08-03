@@ -558,78 +558,379 @@ function EnderDragon() {
   );
 }
 
-function BonusMobSprite({ mob }) {
-  if (mob === 'creeper') {
-    return (
-      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
-        <path fill="#327b31" d="M12 2h32v30h6v28H36v10H25V60H8V32h4z" />
-        <path fill="#62b64d" d="M15 5h25v27H15zM12 34h32v22H12z" />
-        <path fill="#8bd064" d="M16 6h10v7H16zM33 16h7v11h-7zM17 38h8v8h-8z" />
-        <path fill="#17351a" d="M17 15h8v9h-8zM32 15h8v9h-8zM24 27h9v7h-9zM19 33h20v12H19z" />
-        <path fill="#245b28" d="M12 56h12v14H12zM35 56h11v14H35z" />
-      </svg>
-    );
-  }
-
-  if (mob === 'slime') {
-    return (
-      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
-        <path fill="#245c2c" d="M5 17h46v47H5z" />
-        <path fill="#5eb653" d="M8 20h40v40H8z" />
-        <path fill="#9bdd7d" d="M10 22h25v10H10z" />
-        <path fill="#17381d" d="M14 34h9v11h-9zM35 34h9v11h-9zM20 49h20v7H20z" />
-      </svg>
-    );
-  }
-
-  if (mob === 'spider' || mob === 'spiderJockey') {
-    return (
-      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
-        {mob === 'spiderJockey' && (
-          <g className="bonus-mob__rider">
-            <path fill="#d8d9d2" d="M19 0h20v24H19zM24 22h11v19H24z" />
-            <path fill="#525854" d="M22 7h5v6h-5zM32 7h5v6h-5zM27 15h6v4h-6z" />
-            <path fill="#8d6338" d="M38 18h3v24h-3zM36 18h7v3h-7z" />
-          </g>
-        )}
-        <path fill="#211c1c" d="M13 39h32v23H13z" />
-        <path fill="#443735" d="M18 35h24v23H18z" />
-        <path fill="#a62b27" d="M22 42h6v5h-6zM34 42h6v5h-6z" />
-        <g className="bonus-mob__spider-legs" fill="#1b1717">
-          <path d="M13 41H4v-7H0v11h13zM13 48H2v4h11zM13 55H5v8H0v5h10l7-11z" />
-          <path d="M43 41h9v-7h4v11H43zM43 48h11v4H43zM43 55h8v8h5v5H46l-7-11z" />
-        </g>
-      </svg>
-    );
-  }
-
-  if (mob === 'skeleton') {
-    return (
-      <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
-        <path fill="#d7dad3" d="M14 2h29v25H14zM23 27h12v30H23zM13 54h12v16H13zM34 54h11v16H34z" />
-        <path fill="#f0f1e9" d="M17 5h22v18H17z" />
-        <path fill="#4e5551" d="M20 10h6v7h-6zM32 10h6v7h-6zM26 19h7v5h-7z" />
-        <path fill="#916637" d="M43 22h4v40h-4zM40 22h7v4h-7zM40 58h7v4h-7z" />
-        <path fill="none" stroke="#d3ad72" strokeWidth="2" d="M46 24l8 17-8 19" />
-      </svg>
-    );
-  }
-
+function MobSprite({ mob }) {
   return (
-    <svg viewBox="0 0 56 72" shapeRendering="crispEdges" aria-hidden="true">
-      <path fill="#4f8344" d="M14 2h29v26H14z" />
-      <path fill="#72a45b" d="M17 5h22v19H17z" />
-      <path fill="#243725" d="M20 11h6v6h-6zM33 11h6v6h-6zM25 21h13v4H25z" />
-      <path fill="#168e91" d="M12 28h33v27H12z" />
-      <path fill="#263b91" d="M16 54h13v17H16zM32 54h13v17H32z" />
-      <g className="bonus-mob__sword-arm">
-        <path fill="#5f9551" d="M42 30h9v27h-9z" />
-        <path fill="#2aaeb7" d="M46 5h7v32h-7zM40 10h19v7H40z" />
-        <path fill="#c9f7f4" d="M48 7h3v24h-3z" />
-        <path fill="#6a4b29" d="M46 36h7v17h-7z" />
-      </g>
-      {mob === 'jockey' && <path fill="#f2ead2" d="M8 60h42v10H8z" />}
-    </svg>
+    <>
+        {mob === 'creeper' && <svg className="creeper-mascot__sprite" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+          <g className="creeper-mascot__body">
+            <path fill="#49a93c" d="M4 0h56v54H4zM18 54h28v26H18z" />
+            <path fill="#6bc653" d="M4 0h8v54H4zM18 54h7v26h-7zM12 8h12v8H12zM40 2h12v8H40zM30 42h12v12H30z" />
+            <path fill="#30852e" d="M52 0h8v54h-8zM39 54h7v26h-7zM8 34h10v12H8zM44 20h12v10H44zM24 58h8v12h-8z" />
+            <path fill="#17351a" d="M12 16h14v14H12zM38 16h14v14H38zM25 30h14v10H25zM19 38h26v12H19zM24 48h16v6H24z" />
+            <path fill="#255f27" d="M4 8h8v8H4zM28 4h8v8h-8zM48 38h12v8H48zM18 68h8v8h-8zM38 60h8v8h-8z" />
+          </g>
+          <g className="creeper-mascot__leg creeper-mascot__leg--back">
+            <path fill="#2f842d" d="M34 76h18v20H34z" />
+            <path fill="#1f6124" d="M44 76h8v20h-8z" />
+          </g>
+          <g className="creeper-mascot__leg creeper-mascot__leg--front">
+            <path fill="#49a93c" d="M12 76h18v20H12z" />
+            <path fill="#2c762b" d="M12 88h18v8H12z" />
+          </g>
+        </svg>}
+        {mob === 'slime' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--slime" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="slime-sprite__body">
+              <path fill="#1d5728" d="M4 30h56v59H4z" />
+              <path fill="#397f3e" d="M7 33h50v53H7z" />
+              <path fill="#58ad50" d="M10 35h44v48H10z" />
+              <path fill="#75c866" d="M12 37h36v39H12z" />
+              <path fill="#94de7a" d="M13 38h25v11H13z" />
+              <path fill="#b8ee9c" d="M14 39h13v6H14z" />
+              <path fill="#4b9847" d="M48 35h6v48h-6zM10 76h44v7H10z" />
+              <path fill="#32773a" d="M16 46h12v13H16zM38 46h12v13H38z" opacity=".72" />
+              <path fill="#14371c" d="M18 48h10v12H18zM39 48h10v12H39z" />
+              <path fill="#0d2514" d="M25 64h20v8H25zM20 61h8v7h-8z" />
+              <path fill="#2b6b34" d="M28 64h14v4H28z" />
+              <path fill="#82d36f" d="M11 55h5v17h-5zM46 65h7v10h-7zM31 38h7v5h-7z" opacity=".78" />
+            </g>
+          </svg>
+        )}
+        {mob === 'skeleton' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--skeleton" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
+              <path fill="#a1a59e" d="M8 36h10v34H8z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
+              <path fill="#c1c4bc" d="M35 70h10v26H35z" />
+              <path fill="#7c807a" d="M35 90h10v6H35z" />
+            </g>
+            <g className="mob-sprite__body">
+              <path fill="#bfc2ba" d="M13 0h38v34H13z" />
+              <path fill="#e4e4dc" d="M16 3h29v24H16z" />
+              <path fill="#60645f" d="M18 11h10v9H18zM37 11h10v9H37zM28 20h8v7H28zM21 28h7v5H21zM37 28h7v5H37z" />
+              <path fill="#a9ada6" d="M23 34h18v37H23z" />
+              <path fill="#e0e1d9" d="M26 36h12v5H26zM20 44h24v4H20zM20 53h24v4H20zM20 62h24v4H20z" />
+              <path fill="#777b75" d="M29 34h6v37h-6z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-arm">
+              <path fill="#c7cac2" d="M46 36h10v34H46z" />
+              <path fill="#86623b" d="M54 31h4v48h-4zM49 34h5v4h-5zM46 38h5v5h-5zM44 43h4v24h-4zM46 67h5v5h-5zM49 72h5v4h-5z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
+              <path fill="#d5d7cf" d="M23 70h10v26H23z" />
+              <path fill="#8d918b" d="M23 90h10v6H23z" />
+            </g>
+          </svg>
+        )}
+        {mob === 'zombie' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--zombie" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
+              <path fill="#47763e" d="M49 39h12v33H49z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
+              <path fill="#402b63" d="M35 78h15v18H35z" />
+              <path fill="#202038" d="M35 90h15v6H35z" />
+            </g>
+            <g className="mob-sprite__body">
+              <path fill="#47783c" d="M9 0h46v38H9z" />
+              <path fill="#6c9a52" d="M13 3h35v29H13z" />
+              <path fill="#315d34" d="M9 4h8v18H9zM47 0h8v24h-8zM20 28h30v10H20z" />
+              <path fill="#182d20" d="M17 12h11v8H17zM38 12h11v8H38z" />
+              <path fill="#8ea55e" d="M20 13h5v4h-5zM41 13h5v4h-5z" />
+              <path fill="#2b4329" d="M25 25h19v6H25z" />
+              <path fill="#258b8d" d="M14 38h36v31H14z" />
+              <path fill="#35aaa5" d="M18 40h18v25H18z" />
+              <path fill="#1c656e" d="M43 38h7v31h-7z" />
+              <path fill="#76508f" d="M15 68h35v12H15z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-arm mob-sprite__limb--sword-arm">
+              <path fill="#173b4b" d="M10 48h7v-7h7v-7h7v-7h7v-7h11v11h-7v7h-7v7h-7v7H17v7h-7z" />
+              <path fill="#35d6d2" d="M15 47h5v-7h7v-7h7v-7h9v5h-6v7h-7v7h-7v7h-8z" />
+              <path fill="#a6fff4" d="M38 24h5v5h-5zM29 33h5v5h-5zM20 42h5v5h-5z" />
+              <path fill="#24343d" d="M5 51h24v6H5z" />
+              <path fill="#b78b48" d="M8 52h18v3H8z" />
+              <path fill="#6f4a2b" d="M13 56h7v15h-7z" />
+              <path fill="#3c2a21" d="M10 68h13v5H10z" />
+              <path fill="#5d8d4a" d="M3 39h12v33H3z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
+              <path fill="#4c3371" d="M17 78h15v18H17z" />
+              <path fill="#282641" d="M17 90h15v6H17z" />
+            </g>
+          </svg>
+        )}
+        {mob === 'pigman' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--pigman" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
+              <path fill="#b86e67" d="M49 38h12v34H49z" />
+              <path fill="#6c774c" d="M49 52h12v13H49z" />
+              <path fill="#d88b7e" d="M52 40h9v12h-9z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
+              <path fill="#b96f68" d="M35 72h15v24H35z" />
+              <path fill="#6a7549" d="M35 77h15v10H35z" />
+              <path fill="#66423d" d="M35 90h15v6H35z" />
+            </g>
+            <g className="mob-sprite__body">
+              <path fill="#c57a70" d="M9 0h46v38H9z" />
+              <path fill="#e69a8e" d="M13 3h34v28H13z" />
+              <path fill="#f1b0a3" d="M16 5h21v20H16z" />
+              <path fill="#745d43" d="M43 0h12v24H43zM9 4h8v17H9zM34 29h21v9H34z" />
+              <path fill="#68784b" d="M45 4h10v13H45zM10 23h13v15H10zM36 30h10v8H36z" />
+              <path fill="#352525" d="M17 11h10v8H17zM39 11h10v8H39z" />
+              <path fill="#cf746e" d="M22 20h25v14H22z" />
+              <path fill="#e39087" d="M25 22h17v9H25z" />
+              <path fill="#633c3a" d="M25 25h5v6h-5zM37 25h5v6h-5z" />
+              <path fill="#c87b71" d="M14 38h36v35H14z" />
+              <path fill="#e49a8c" d="M18 40h18v28H18z" />
+              <path fill="#6c784c" d="M39 38h11v24H39zM14 57h13v16H14z" />
+              <path fill="#8d5a43" d="M14 68h36v10H14z" />
+              <path fill="#b7b6a8" d="M42 43h8v12H42z" />
+              <path fill="#6d6c64" d="M45 43h5v12h-5z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-arm mob-sprite__limb--sword-arm">
+              <path fill="#aa7c20" d="M11 47h7v-7h7v-7h7v-7h7v-7h11v11h-7v7h-7v7h-7v7H18v7h-7z" />
+              <path fill="#f0c83f" d="M16 46h5v-7h7v-7h7v-7h9v5h-6v7h-7v7h-7v7h-8z" />
+              <path fill="#fff08b" d="M39 23h5v5h-5zM30 32h5v5h-5zM21 41h5v5h-5z" />
+              <path fill="#8b6630" d="M6 50h24v6H6z" />
+              <path fill="#d4a23b" d="M9 51h18v3H9z" />
+              <path fill="#674226" d="M14 55h7v16h-7z" />
+              <path fill="#3c2a21" d="M11 68h13v5H11z" />
+              <path fill="#db8e82" d="M3 38h12v34H3z" />
+              <path fill="#68784b" d="M3 55h12v13H3z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
+              <path fill="#dc8c81" d="M17 72h15v24H17z" />
+              <path fill="#efaaa0" d="M20 73h12v15H20z" />
+              <path fill="#704844" d="M17 90h15v6H17z" />
+            </g>
+          </svg>
+        )}
+        {mob === 'enderman' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--enderman" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="mob-sprite__limb mob-sprite__limb--back-arm enderman__limb">
+              <path fill="#0b0c0d" d="M49 31h9v31h-7v7H40v-9h9z" />
+              <path fill="#202023" d="M52 33h6v26h-6z" />
+              <path fill="#08090a" d="M40 60h12v9H40z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--back-leg enderman__limb">
+              <path fill="#0a0b0c" d="M35 59h11v37H35z" />
+              <path fill="#1d1c20" d="M39 61h7v29h-7z" />
+              <path fill="#060708" d="M35 91h14v5H35z" />
+            </g>
+            <g className="mob-sprite__body enderman__body">
+              <path fill="#0a0b0c" d="M10 0h44v30H10z" />
+              <path fill="#19191c" d="M14 3h35v23H14z" />
+              <path fill="#262329" d="M18 5h27v18H18z" />
+              <path fill="#0d0e10" d="M10 0h8v30h-8zM47 0h7v30h-7zM18 24h29v6H18z" />
+              <g className="enderman__eyes">
+                <path fill="#bb22ee" d="M16 11h13v5H16zM36 11h13v5H36z" />
+                <path fill="#f09cff" d="M22 11h7v3h-7zM42 11h7v3h-7z" />
+                <path fill="#7811a4" d="M16 15h13v2H16zM36 15h13v2H36z" />
+              </g>
+              <path fill="#08090a" d="M22 30h20v32H22z" />
+              <path fill="#1b1a1e" d="M26 32h12v26H26z" />
+              <path fill="#26242a" d="M29 34h9v18h-9z" />
+              <path fill="#070809" d="M22 57h20v6H22z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-arm enderman__limb">
+              <path fill="#0d0e10" d="M6 31h9v29h9v9H12v-7H6z" />
+              <path fill="#262329" d="M9 33h6v25H9z" />
+              <path fill="#08090a" d="M12 60h12v9H12z" />
+            </g>
+            <g className="mob-sprite__limb mob-sprite__limb--front-leg enderman__limb">
+              <path fill="#0c0d0e" d="M20 59h11v37H20z" />
+              <path fill="#252329" d="M23 61h8v29h-8z" />
+              <path fill="#060708" d="M17 91h14v5H17z" />
+            </g>
+            <g className="enderman__grass-block">
+              <path fill="#281b12" d="M20 56h24v25H20z" />
+              <path fill="#79502f" d="M22 58h20v21H22z" />
+              <path fill="#9a6840" d="M24 65h7v5h-7zM35 61h7v8h-7zM31 72h8v7h-8zM22 75h6v4h-6z" />
+              <path fill="#4c8f35" d="M20 56h24v9H20z" />
+              <path fill="#72b84b" d="M22 56h8v4h-8zM34 57h8v3h-8z" />
+              <path fill="#326d2d" d="M20 61h6v6h-6zM29 60h6v6h-6zM40 60h4v7h-4z" />
+              <path fill="#b18255" d="M26 69h4v3h-4zM36 70h6v3h-6zM29 77h5v2h-5z" />
+            </g>
+          </svg>
+        )}
+        {mob === 'enderman' && (
+          <span className="enderman-particles">
+            {Array.from({ length: 14 }, (_, index) => (
+              <i
+                key={index}
+                style={{
+                  '--particle-x': `${((index * 29) % 92) - 8}%`,
+                  '--particle-y': `${(index * 17) % 90}px`,
+                  '--particle-delay': `${-(index * 137) % 1600}ms`,
+                  '--particle-drift': `${index % 2 ? -11 : 11}px`,
+                  '--particle-duration': `${1100 + (index % 4) * 180}ms`,
+                }}
+              />
+            ))}
+          </span>
+        )}
+        {mob === 'jockey' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--jockey" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="jockey-chicken__wing jockey-chicken__wing--back">
+              <path fill="#c9c8bb" d="M9 61h19v19H9z" />
+              <path fill="#aead9f" d="M9 73h15v9H9z" />
+            </g>
+            <g className="mob-sprite__limb jockey-chicken__leg jockey-chicken__leg--back mob-sprite__limb--back-leg">
+              <path fill="#b27b2c" d="M37 80h5v14h-5zM34 92h12v4H34z" />
+            </g>
+            <g className="jockey-chicken__body">
+              <path fill="#e6e2d2" d="M8 55h45v29H8z" />
+              <path fill="#fffdf0" d="M12 57h30v20H12z" />
+              <path fill="#c7c4b6" d="M8 76h45v9H8z" />
+              <path fill="#f2eee0" d="M40 43h19v27H40z" />
+              <path fill="#fffdf2" d="M43 45h14v17H43z" />
+              <path fill="#20251f" d="M44 50h4v4h-4zM53 50h4v4h-4z" />
+              <path fill="#e1a02b" d="M58 55h6v7h-6z" />
+              <path fill="#cf3d31" d="M45 62h10v9H45z" />
+              <path fill="#d84a38" d="M48 40h8v5h-8z" />
+            </g>
+            <g className="jockey-chicken__wing jockey-chicken__wing--front">
+              <path fill="#f4f0e2" d="M17 61h23v20H17z" />
+              <path fill="#d7d4c7" d="M22 73h18v10H22z" />
+            </g>
+            <g className="mob-sprite__limb jockey-chicken__leg jockey-chicken__leg--front mob-sprite__limb--front-leg">
+              <path fill="#d79b38" d="M22 80h5v14h-5zM18 92h13v4H18z" />
+            </g>
+            <g className="jockey-rider">
+            <g className="jockey-rider__leg jockey-rider__leg--back">
+              <path fill="#4a326c" d="M34 43h10v18H34z" />
+            </g>
+            <g className="jockey-rider__body">
+              <path fill="#287f82" d="M20 24h25v23H20z" />
+              <path fill="#3ca9a5" d="M23 25h14v19H23z" />
+              <path fill="#4c3371" d="M20 43h24v9H20z" />
+              <path fill="#4f7e42" d="M16 0h32v25H16z" />
+              <path fill="#6d9b54" d="M19 3h24v18H19z" />
+              <path fill="#315c34" d="M16 4h6v13h-6zM42 0h6v18h-6z" />
+              <path fill="#172a1e" d="M22 9h7v6H22zM36 9h7v6h-7z" />
+              <path fill="#91a760" d="M24 10h3v3h-3zM38 10h3v3h-3z" />
+              <path fill="#2c432b" d="M27 18h13v4H27z" />
+            </g>
+            <g className="jockey-rider__arm jockey-rider__arm--back">
+              <path fill="#48763f" d="M44 26h9v24h-9z" />
+            </g>
+            <g className="jockey-rider__arm jockey-rider__arm--front">
+              <path fill="#5f8e49" d="M12 26h9v24h-9z" />
+            </g>
+            <g className="jockey-rider__leg jockey-rider__leg--front">
+              <path fill="#5a3c7b" d="M21 43h10v18H21z" />
+            </g>
+            </g>
+          </svg>
+        )}
+        {mob === 'spider' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--spider" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="spider-leg spider-leg--a spider-leg--left-1">
+              <path fill="#282321" d="M24 51H12v-8H3v6h5v9h16z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--left-2">
+              <path fill="#332c29" d="M23 57H9v-5H0v7h7v6h16z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--left-3">
+              <path fill="#211d1b" d="M23 64H8v6H0v7h12v-6h11z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--left-4">
+              <path fill="#3b332e" d="M25 69H13v10H5v9h7v-4h7V75h6z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--right-1">
+              <path fill="#211d1b" d="M40 51h12v-8h9v6h-5v9H40z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--right-2">
+              <path fill="#37302c" d="M41 57h14v-5h9v7h-7v6H41z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--right-3">
+              <path fill="#292320" d="M41 64h15v6h8v7H52v-6H41z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--right-4">
+              <path fill="#403732" d="M39 69h12v10h8v9h-7v-4h-7V75h-6z" />
+            </g>
+            <g className="spider-body">
+              <path fill="#2b2623" d="M7 44h35v31H7z" />
+              <path fill="#493e38" d="M11 47h25v23H11z" />
+              <path fill="#5a4a41" d="M14 49h13v10H14z" />
+              <path fill="#211d1b" d="M35 51h27v25H35z" />
+              <path fill="#3a312d" d="M39 54h19v18H39z" />
+              <path fill="#a62324" d="M40 58h6v5h-6zM49 57h6v6h-6zM57 59h5v5h-5z" />
+              <path fill="#f04a3f" d="M42 58h3v2h-3zM51 57h3v3h-3z" />
+              <path fill="#171413" d="M10 67h26v9H10zM39 69h20v8H39z" />
+            </g>
+          </svg>
+        )}
+        {mob === 'spiderJockey' && (
+          <svg className="creeper-mascot__sprite creeper-mascot__sprite--spider-jockey" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
+            <g className="spider-leg spider-leg--a spider-leg--left-1">
+              <path fill="#282321" d="M24 64H12v-7H3v6h5v8h16z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--left-2">
+              <path fill="#332c29" d="M23 70H9v-4H0v7h7v5h16z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--left-3">
+              <path fill="#211d1b" d="M23 76H8v5H0v7h12v-5h11z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--left-4">
+              <path fill="#3b332e" d="M25 80H13v8H5v8h7v-3h7v-7h6z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--right-1">
+              <path fill="#211d1b" d="M40 64h12v-7h9v6h-5v8H40z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--right-2">
+              <path fill="#37302c" d="M41 70h14v-4h9v7h-7v5H41z" />
+            </g>
+            <g className="spider-leg spider-leg--b spider-leg--right-3">
+              <path fill="#292320" d="M41 76h15v5h8v7H52v-5H41z" />
+            </g>
+            <g className="spider-leg spider-leg--a spider-leg--right-4">
+              <path fill="#403732" d="M39 80h12v8h8v8h-7v-3h-7v-7h-6z" />
+            </g>
+            <g className="spider-body">
+              <path fill="#2b2623" d="M7 55h35v27H7z" />
+              <path fill="#493e38" d="M11 58h25v20H11z" />
+              <path fill="#5a4a41" d="M14 60h13v9H14z" />
+              <path fill="#211d1b" d="M35 62h27v22H35z" />
+              <path fill="#3a312d" d="M39 65h19v15H39z" />
+              <path fill="#a62324" d="M40 68h6v5h-6zM49 67h6v6h-6zM57 69h5v5h-5z" />
+              <path fill="#f04a3f" d="M42 68h3v2h-3zM51 67h3v3h-3z" />
+              <path fill="#171413" d="M10 75h26v8H10zM39 77h20v8H39z" />
+            </g>
+            <g className="spider-jockey__rider">
+              <g className="mob-sprite__limb mob-sprite__limb--back-leg spider-jockey__rider-leg">
+                <path fill="#9da3a0" d="M35 48h8v18h-8z" />
+                <path fill="#747b78" d="M35 61h12v5H35z" />
+              </g>
+              <g className="mob-sprite__limb mob-sprite__limb--back-arm">
+                <path fill="#aeb4b0" d="M9 29h8v28H9z" />
+                <path fill="#858c88" d="M9 49h12v8H9z" />
+              </g>
+              <g className="spider-jockey__body">
+                <path fill="#c8ceca" d="M24 27h17v28H24z" />
+                <path fill="#848b87" d="M27 31h11v4H27zM27 39h11v3H27zM27 47h11v3H27z" />
+                <path fill="#6c7470" d="M31 28h4v27h-4z" />
+                <path fill="#d2d7d3" d="M16 0h32v27H16z" />
+                <path fill="#aeb4b0" d="M20 4h24v19H20z" />
+                <path fill="#747b78" d="M16 0h7v6h-7zM41 0h7v8h-7zM19 21h27v6H19z" />
+                <path fill="#242725" d="M21 9h7v7h-7zM36 9h7v7h-7zM27 19h11v5H27z" />
+              </g>
+              <g className="mob-sprite__limb mob-sprite__limb--front-arm">
+                <path fill="#c2c8c4" d="M42 29h8v28h-8z" />
+                <path fill="#916337" d="M50 25h4v35h-4zM47 25h7v4h-7zM47 56h7v4h-7z" />
+                <path fill="none" stroke="#d2b07b" strokeWidth="2" d="M53 27l7 15-7 16" />
+              </g>
+              <g className="mob-sprite__limb mob-sprite__limb--front-leg spider-jockey__rider-leg">
+                <path fill="#b8bebb" d="M22 48h8v18h-8z" />
+                <path fill="#858c88" d="M18 61h12v5H18z" />
+              </g>
+            </g>
+          </svg>
+        )}
+
+    </>
   );
 }
 
@@ -1721,374 +2022,7 @@ function CreeperMascot() {
         </div>
       </div>
       <div className="creeper-mascot__walker" aria-hidden="true">
-        {selectedMob === 'creeper' && <svg className="creeper-mascot__sprite" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-          <g className="creeper-mascot__body">
-            <path fill="#49a93c" d="M4 0h56v54H4zM18 54h28v26H18z" />
-            <path fill="#6bc653" d="M4 0h8v54H4zM18 54h7v26h-7zM12 8h12v8H12zM40 2h12v8H40zM30 42h12v12H30z" />
-            <path fill="#30852e" d="M52 0h8v54h-8zM39 54h7v26h-7zM8 34h10v12H8zM44 20h12v10H44zM24 58h8v12h-8z" />
-            <path fill="#17351a" d="M12 16h14v14H12zM38 16h14v14H38zM25 30h14v10H25zM19 38h26v12H19zM24 48h16v6H24z" />
-            <path fill="#255f27" d="M4 8h8v8H4zM28 4h8v8h-8zM48 38h12v8H48zM18 68h8v8h-8zM38 60h8v8h-8z" />
-          </g>
-          <g className="creeper-mascot__leg creeper-mascot__leg--back">
-            <path fill="#2f842d" d="M34 76h18v20H34z" />
-            <path fill="#1f6124" d="M44 76h8v20h-8z" />
-          </g>
-          <g className="creeper-mascot__leg creeper-mascot__leg--front">
-            <path fill="#49a93c" d="M12 76h18v20H12z" />
-            <path fill="#2c762b" d="M12 88h18v8H12z" />
-          </g>
-        </svg>}
-        {selectedMob === 'slime' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--slime" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="slime-sprite__body">
-              <path fill="#1d5728" d="M4 30h56v59H4z" />
-              <path fill="#397f3e" d="M7 33h50v53H7z" />
-              <path fill="#58ad50" d="M10 35h44v48H10z" />
-              <path fill="#75c866" d="M12 37h36v39H12z" />
-              <path fill="#94de7a" d="M13 38h25v11H13z" />
-              <path fill="#b8ee9c" d="M14 39h13v6H14z" />
-              <path fill="#4b9847" d="M48 35h6v48h-6zM10 76h44v7H10z" />
-              <path fill="#32773a" d="M16 46h12v13H16zM38 46h12v13H38z" opacity=".72" />
-              <path fill="#14371c" d="M18 48h10v12H18zM39 48h10v12H39z" />
-              <path fill="#0d2514" d="M25 64h20v8H25zM20 61h8v7h-8z" />
-              <path fill="#2b6b34" d="M28 64h14v4H28z" />
-              <path fill="#82d36f" d="M11 55h5v17h-5zM46 65h7v10h-7zM31 38h7v5h-7z" opacity=".78" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'skeleton' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--skeleton" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
-              <path fill="#a1a59e" d="M8 36h10v34H8z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
-              <path fill="#c1c4bc" d="M35 70h10v26H35z" />
-              <path fill="#7c807a" d="M35 90h10v6H35z" />
-            </g>
-            <g className="mob-sprite__body">
-              <path fill="#bfc2ba" d="M13 0h38v34H13z" />
-              <path fill="#e4e4dc" d="M16 3h29v24H16z" />
-              <path fill="#60645f" d="M18 11h10v9H18zM37 11h10v9H37zM28 20h8v7H28zM21 28h7v5H21zM37 28h7v5H37z" />
-              <path fill="#a9ada6" d="M23 34h18v37H23z" />
-              <path fill="#e0e1d9" d="M26 36h12v5H26zM20 44h24v4H20zM20 53h24v4H20zM20 62h24v4H20z" />
-              <path fill="#777b75" d="M29 34h6v37h-6z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-arm">
-              <path fill="#c7cac2" d="M46 36h10v34H46z" />
-              <path fill="#86623b" d="M54 31h4v48h-4zM49 34h5v4h-5zM46 38h5v5h-5zM44 43h4v24h-4zM46 67h5v5h-5zM49 72h5v4h-5z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
-              <path fill="#d5d7cf" d="M23 70h10v26H23z" />
-              <path fill="#8d918b" d="M23 90h10v6H23z" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'zombie' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--zombie" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
-              <path fill="#47763e" d="M49 39h12v33H49z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
-              <path fill="#402b63" d="M35 78h15v18H35z" />
-              <path fill="#202038" d="M35 90h15v6H35z" />
-            </g>
-            <g className="mob-sprite__body">
-              <path fill="#47783c" d="M9 0h46v38H9z" />
-              <path fill="#6c9a52" d="M13 3h35v29H13z" />
-              <path fill="#315d34" d="M9 4h8v18H9zM47 0h8v24h-8zM20 28h30v10H20z" />
-              <path fill="#182d20" d="M17 12h11v8H17zM38 12h11v8H38z" />
-              <path fill="#8ea55e" d="M20 13h5v4h-5zM41 13h5v4h-5z" />
-              <path fill="#2b4329" d="M25 25h19v6H25z" />
-              <path fill="#258b8d" d="M14 38h36v31H14z" />
-              <path fill="#35aaa5" d="M18 40h18v25H18z" />
-              <path fill="#1c656e" d="M43 38h7v31h-7z" />
-              <path fill="#76508f" d="M15 68h35v12H15z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-arm mob-sprite__limb--sword-arm">
-              <path fill="#173b4b" d="M10 48h7v-7h7v-7h7v-7h7v-7h11v11h-7v7h-7v7h-7v7H17v7h-7z" />
-              <path fill="#35d6d2" d="M15 47h5v-7h7v-7h7v-7h9v5h-6v7h-7v7h-7v7h-8z" />
-              <path fill="#a6fff4" d="M38 24h5v5h-5zM29 33h5v5h-5zM20 42h5v5h-5z" />
-              <path fill="#24343d" d="M5 51h24v6H5z" />
-              <path fill="#b78b48" d="M8 52h18v3H8z" />
-              <path fill="#6f4a2b" d="M13 56h7v15h-7z" />
-              <path fill="#3c2a21" d="M10 68h13v5H10z" />
-              <path fill="#5d8d4a" d="M3 39h12v33H3z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
-              <path fill="#4c3371" d="M17 78h15v18H17z" />
-              <path fill="#282641" d="M17 90h15v6H17z" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'pigman' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--pigman" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="mob-sprite__limb mob-sprite__limb--back-arm">
-              <path fill="#b86e67" d="M49 38h12v34H49z" />
-              <path fill="#6c774c" d="M49 52h12v13H49z" />
-              <path fill="#d88b7e" d="M52 40h9v12h-9z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--back-leg">
-              <path fill="#b96f68" d="M35 72h15v24H35z" />
-              <path fill="#6a7549" d="M35 77h15v10H35z" />
-              <path fill="#66423d" d="M35 90h15v6H35z" />
-            </g>
-            <g className="mob-sprite__body">
-              <path fill="#c57a70" d="M9 0h46v38H9z" />
-              <path fill="#e69a8e" d="M13 3h34v28H13z" />
-              <path fill="#f1b0a3" d="M16 5h21v20H16z" />
-              <path fill="#745d43" d="M43 0h12v24H43zM9 4h8v17H9zM34 29h21v9H34z" />
-              <path fill="#68784b" d="M45 4h10v13H45zM10 23h13v15H10zM36 30h10v8H36z" />
-              <path fill="#352525" d="M17 11h10v8H17zM39 11h10v8H39z" />
-              <path fill="#cf746e" d="M22 20h25v14H22z" />
-              <path fill="#e39087" d="M25 22h17v9H25z" />
-              <path fill="#633c3a" d="M25 25h5v6h-5zM37 25h5v6h-5z" />
-              <path fill="#c87b71" d="M14 38h36v35H14z" />
-              <path fill="#e49a8c" d="M18 40h18v28H18z" />
-              <path fill="#6c784c" d="M39 38h11v24H39zM14 57h13v16H14z" />
-              <path fill="#8d5a43" d="M14 68h36v10H14z" />
-              <path fill="#b7b6a8" d="M42 43h8v12H42z" />
-              <path fill="#6d6c64" d="M45 43h5v12h-5z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-arm mob-sprite__limb--sword-arm">
-              <path fill="#aa7c20" d="M11 47h7v-7h7v-7h7v-7h7v-7h11v11h-7v7h-7v7h-7v7H18v7h-7z" />
-              <path fill="#f0c83f" d="M16 46h5v-7h7v-7h7v-7h9v5h-6v7h-7v7h-7v7h-8z" />
-              <path fill="#fff08b" d="M39 23h5v5h-5zM30 32h5v5h-5zM21 41h5v5h-5z" />
-              <path fill="#8b6630" d="M6 50h24v6H6z" />
-              <path fill="#d4a23b" d="M9 51h18v3H9z" />
-              <path fill="#674226" d="M14 55h7v16h-7z" />
-              <path fill="#3c2a21" d="M11 68h13v5H11z" />
-              <path fill="#db8e82" d="M3 38h12v34H3z" />
-              <path fill="#68784b" d="M3 55h12v13H3z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-leg">
-              <path fill="#dc8c81" d="M17 72h15v24H17z" />
-              <path fill="#efaaa0" d="M20 73h12v15H20z" />
-              <path fill="#704844" d="M17 90h15v6H17z" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'enderman' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--enderman" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="mob-sprite__limb mob-sprite__limb--back-arm enderman__limb">
-              <path fill="#0b0c0d" d="M49 31h9v31h-7v7H40v-9h9z" />
-              <path fill="#202023" d="M52 33h6v26h-6z" />
-              <path fill="#08090a" d="M40 60h12v9H40z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--back-leg enderman__limb">
-              <path fill="#0a0b0c" d="M35 59h11v37H35z" />
-              <path fill="#1d1c20" d="M39 61h7v29h-7z" />
-              <path fill="#060708" d="M35 91h14v5H35z" />
-            </g>
-            <g className="mob-sprite__body enderman__body">
-              <path fill="#0a0b0c" d="M10 0h44v30H10z" />
-              <path fill="#19191c" d="M14 3h35v23H14z" />
-              <path fill="#262329" d="M18 5h27v18H18z" />
-              <path fill="#0d0e10" d="M10 0h8v30h-8zM47 0h7v30h-7zM18 24h29v6H18z" />
-              <g className="enderman__eyes">
-                <path fill="#bb22ee" d="M16 11h13v5H16zM36 11h13v5H36z" />
-                <path fill="#f09cff" d="M22 11h7v3h-7zM42 11h7v3h-7z" />
-                <path fill="#7811a4" d="M16 15h13v2H16zM36 15h13v2H36z" />
-              </g>
-              <path fill="#08090a" d="M22 30h20v32H22z" />
-              <path fill="#1b1a1e" d="M26 32h12v26H26z" />
-              <path fill="#26242a" d="M29 34h9v18h-9z" />
-              <path fill="#070809" d="M22 57h20v6H22z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-arm enderman__limb">
-              <path fill="#0d0e10" d="M6 31h9v29h9v9H12v-7H6z" />
-              <path fill="#262329" d="M9 33h6v25H9z" />
-              <path fill="#08090a" d="M12 60h12v9H12z" />
-            </g>
-            <g className="mob-sprite__limb mob-sprite__limb--front-leg enderman__limb">
-              <path fill="#0c0d0e" d="M20 59h11v37H20z" />
-              <path fill="#252329" d="M23 61h8v29h-8z" />
-              <path fill="#060708" d="M17 91h14v5H17z" />
-            </g>
-            <g className="enderman__grass-block">
-              <path fill="#281b12" d="M20 56h24v25H20z" />
-              <path fill="#79502f" d="M22 58h20v21H22z" />
-              <path fill="#9a6840" d="M24 65h7v5h-7zM35 61h7v8h-7zM31 72h8v7h-8zM22 75h6v4h-6z" />
-              <path fill="#4c8f35" d="M20 56h24v9H20z" />
-              <path fill="#72b84b" d="M22 56h8v4h-8zM34 57h8v3h-8z" />
-              <path fill="#326d2d" d="M20 61h6v6h-6zM29 60h6v6h-6zM40 60h4v7h-4z" />
-              <path fill="#b18255" d="M26 69h4v3h-4zM36 70h6v3h-6zM29 77h5v2h-5z" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'enderman' && (
-          <span className="enderman-particles">
-            {Array.from({ length: 14 }, (_, index) => (
-              <i
-                key={index}
-                style={{
-                  '--particle-x': `${((index * 29) % 92) - 8}%`,
-                  '--particle-y': `${(index * 17) % 90}px`,
-                  '--particle-delay': `${-(index * 137) % 1600}ms`,
-                  '--particle-drift': `${index % 2 ? -11 : 11}px`,
-                  '--particle-duration': `${1100 + (index % 4) * 180}ms`,
-                }}
-              />
-            ))}
-          </span>
-        )}
-        {selectedMob === 'jockey' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--jockey" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="jockey-chicken__wing jockey-chicken__wing--back">
-              <path fill="#c9c8bb" d="M9 61h19v19H9z" />
-              <path fill="#aead9f" d="M9 73h15v9H9z" />
-            </g>
-            <g className="mob-sprite__limb jockey-chicken__leg jockey-chicken__leg--back mob-sprite__limb--back-leg">
-              <path fill="#b27b2c" d="M37 80h5v14h-5zM34 92h12v4H34z" />
-            </g>
-            <g className="jockey-chicken__body">
-              <path fill="#e6e2d2" d="M8 55h45v29H8z" />
-              <path fill="#fffdf0" d="M12 57h30v20H12z" />
-              <path fill="#c7c4b6" d="M8 76h45v9H8z" />
-              <path fill="#f2eee0" d="M40 43h19v27H40z" />
-              <path fill="#fffdf2" d="M43 45h14v17H43z" />
-              <path fill="#20251f" d="M44 50h4v4h-4zM53 50h4v4h-4z" />
-              <path fill="#e1a02b" d="M58 55h6v7h-6z" />
-              <path fill="#cf3d31" d="M45 62h10v9H45z" />
-              <path fill="#d84a38" d="M48 40h8v5h-8z" />
-            </g>
-            <g className="jockey-chicken__wing jockey-chicken__wing--front">
-              <path fill="#f4f0e2" d="M17 61h23v20H17z" />
-              <path fill="#d7d4c7" d="M22 73h18v10H22z" />
-            </g>
-            <g className="mob-sprite__limb jockey-chicken__leg jockey-chicken__leg--front mob-sprite__limb--front-leg">
-              <path fill="#d79b38" d="M22 80h5v14h-5zM18 92h13v4H18z" />
-            </g>
-            <g className="jockey-rider">
-            <g className="jockey-rider__leg jockey-rider__leg--back">
-              <path fill="#4a326c" d="M34 43h10v18H34z" />
-            </g>
-            <g className="jockey-rider__body">
-              <path fill="#287f82" d="M20 24h25v23H20z" />
-              <path fill="#3ca9a5" d="M23 25h14v19H23z" />
-              <path fill="#4c3371" d="M20 43h24v9H20z" />
-              <path fill="#4f7e42" d="M16 0h32v25H16z" />
-              <path fill="#6d9b54" d="M19 3h24v18H19z" />
-              <path fill="#315c34" d="M16 4h6v13h-6zM42 0h6v18h-6z" />
-              <path fill="#172a1e" d="M22 9h7v6H22zM36 9h7v6h-7z" />
-              <path fill="#91a760" d="M24 10h3v3h-3zM38 10h3v3h-3z" />
-              <path fill="#2c432b" d="M27 18h13v4H27z" />
-            </g>
-            <g className="jockey-rider__arm jockey-rider__arm--back">
-              <path fill="#48763f" d="M44 26h9v24h-9z" />
-            </g>
-            <g className="jockey-rider__arm jockey-rider__arm--front">
-              <path fill="#5f8e49" d="M12 26h9v24h-9z" />
-            </g>
-            <g className="jockey-rider__leg jockey-rider__leg--front">
-              <path fill="#5a3c7b" d="M21 43h10v18H21z" />
-            </g>
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'spider' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--spider" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="spider-leg spider-leg--a spider-leg--left-1">
-              <path fill="#282321" d="M24 51H12v-8H3v6h5v9h16z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--left-2">
-              <path fill="#332c29" d="M23 57H9v-5H0v7h7v6h16z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--left-3">
-              <path fill="#211d1b" d="M23 64H8v6H0v7h12v-6h11z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--left-4">
-              <path fill="#3b332e" d="M25 69H13v10H5v9h7v-4h7V75h6z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--right-1">
-              <path fill="#211d1b" d="M40 51h12v-8h9v6h-5v9H40z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--right-2">
-              <path fill="#37302c" d="M41 57h14v-5h9v7h-7v6H41z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--right-3">
-              <path fill="#292320" d="M41 64h15v6h8v7H52v-6H41z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--right-4">
-              <path fill="#403732" d="M39 69h12v10h8v9h-7v-4h-7V75h-6z" />
-            </g>
-            <g className="spider-body">
-              <path fill="#2b2623" d="M7 44h35v31H7z" />
-              <path fill="#493e38" d="M11 47h25v23H11z" />
-              <path fill="#5a4a41" d="M14 49h13v10H14z" />
-              <path fill="#211d1b" d="M35 51h27v25H35z" />
-              <path fill="#3a312d" d="M39 54h19v18H39z" />
-              <path fill="#a62324" d="M40 58h6v5h-6zM49 57h6v6h-6zM57 59h5v5h-5z" />
-              <path fill="#f04a3f" d="M42 58h3v2h-3zM51 57h3v3h-3z" />
-              <path fill="#171413" d="M10 67h26v9H10zM39 69h20v8H39z" />
-            </g>
-          </svg>
-        )}
-        {selectedMob === 'spiderJockey' && (
-          <svg className="creeper-mascot__sprite creeper-mascot__sprite--spider-jockey" viewBox="0 0 64 96" role="presentation" shapeRendering="crispEdges">
-            <g className="spider-leg spider-leg--a spider-leg--left-1">
-              <path fill="#282321" d="M24 64H12v-7H3v6h5v8h16z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--left-2">
-              <path fill="#332c29" d="M23 70H9v-4H0v7h7v5h16z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--left-3">
-              <path fill="#211d1b" d="M23 76H8v5H0v7h12v-5h11z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--left-4">
-              <path fill="#3b332e" d="M25 80H13v8H5v8h7v-3h7v-7h6z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--right-1">
-              <path fill="#211d1b" d="M40 64h12v-7h9v6h-5v8H40z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--right-2">
-              <path fill="#37302c" d="M41 70h14v-4h9v7h-7v5H41z" />
-            </g>
-            <g className="spider-leg spider-leg--b spider-leg--right-3">
-              <path fill="#292320" d="M41 76h15v5h8v7H52v-5H41z" />
-            </g>
-            <g className="spider-leg spider-leg--a spider-leg--right-4">
-              <path fill="#403732" d="M39 80h12v8h8v8h-7v-3h-7v-7h-6z" />
-            </g>
-            <g className="spider-body">
-              <path fill="#2b2623" d="M7 55h35v27H7z" />
-              <path fill="#493e38" d="M11 58h25v20H11z" />
-              <path fill="#5a4a41" d="M14 60h13v9H14z" />
-              <path fill="#211d1b" d="M35 62h27v22H35z" />
-              <path fill="#3a312d" d="M39 65h19v15H39z" />
-              <path fill="#a62324" d="M40 68h6v5h-6zM49 67h6v6h-6zM57 69h5v5h-5z" />
-              <path fill="#f04a3f" d="M42 68h3v2h-3zM51 67h3v3h-3z" />
-              <path fill="#171413" d="M10 75h26v8H10zM39 77h20v8H39z" />
-            </g>
-            <g className="spider-jockey__rider">
-              <g className="mob-sprite__limb mob-sprite__limb--back-leg spider-jockey__rider-leg">
-                <path fill="#9da3a0" d="M35 48h8v18h-8z" />
-                <path fill="#747b78" d="M35 61h12v5H35z" />
-              </g>
-              <g className="mob-sprite__limb mob-sprite__limb--back-arm">
-                <path fill="#aeb4b0" d="M9 29h8v28H9z" />
-                <path fill="#858c88" d="M9 49h12v8H9z" />
-              </g>
-              <g className="spider-jockey__body">
-                <path fill="#c8ceca" d="M24 27h17v28H24z" />
-                <path fill="#848b87" d="M27 31h11v4H27zM27 39h11v3H27zM27 47h11v3H27z" />
-                <path fill="#6c7470" d="M31 28h4v27h-4z" />
-                <path fill="#d2d7d3" d="M16 0h32v27H16z" />
-                <path fill="#aeb4b0" d="M20 4h24v19H20z" />
-                <path fill="#747b78" d="M16 0h7v6h-7zM41 0h7v8h-7zM19 21h27v6H19z" />
-                <path fill="#242725" d="M21 9h7v7h-7zM36 9h7v7h-7zM27 19h11v5H27z" />
-              </g>
-              <g className="mob-sprite__limb mob-sprite__limb--front-arm">
-                <path fill="#c2c8c4" d="M42 29h8v28h-8z" />
-                <path fill="#916337" d="M50 25h4v35h-4zM47 25h7v4h-7zM47 56h7v4h-7z" />
-                <path fill="none" stroke="#d2b07b" strokeWidth="2" d="M53 27l7 15-7 16" />
-              </g>
-              <g className="mob-sprite__limb mob-sprite__limb--front-leg spider-jockey__rider-leg">
-                <path fill="#b8bebb" d="M22 48h8v18h-8z" />
-                <path fill="#858c88" d="M18 61h12v5H18z" />
-              </g>
-            </g>
-          </svg>
-        )}
+        <MobSprite mob={selectedMob} />
         <span className="creeper-mascot__shadow" />
         <span className="creeper-mascot__burst">
           {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
@@ -2106,7 +2040,7 @@ function CreeperMascot() {
           aria-hidden="true"
         >
           <span className="bonus-mob__sprite">
-            <BonusMobSprite mob={mob.mob} />
+            <MobSprite mob={mob.mob} />
           </span>
           <span className="bonus-mob__shadow" />
           {mob.mob === 'creeper' && mob.status === 'charging' && <span className="bonus-mob__fuse">!</span>}

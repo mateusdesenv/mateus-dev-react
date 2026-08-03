@@ -929,7 +929,16 @@ textarea:focus-visible {
 
 .skill-card:hover {
   border-color: var(--line-strong);
-  background: rgba(18, 29, 35, 0.95);
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent));
+}
+
+.skill-card:hover h3 {
+  color: var(--text);
+}
+
+.skill-card:hover ul {
+  color: var(--muted);
 }
 
 .skill-card > svg {
@@ -3803,10 +3812,33 @@ html[data-theme="end"] body {
   animation: bonus-slime-attack 220ms steps(3, end) both;
 }
 
-.bonus-mob--attacking .bonus-mob__sword-arm {
+.bonus-mob--attacking .bonus-mob__sword-arm,
+.bonus-mob--attacking .mob-sprite__limb--sword-arm {
   transform-box: fill-box;
   transform-origin: center top;
   animation: bonus-sword-strike 260ms steps(3, end) both;
+}
+
+.bonus-mob--zombie .mob-sprite__limb--sword-arm {
+  transform-box: view-box;
+  transform-origin: 9px 40px;
+}
+
+.bonus-mob--skeleton .mob-sprite__limb {
+  animation-duration: 360ms;
+}
+
+.bonus-mob--zombie .mob-sprite__limb {
+  animation-duration: 440ms;
+}
+
+.bonus-mob--jockey .jockey-chicken__leg {
+  animation-duration: 260ms;
+}
+
+.bonus-mob--spiderJockey .spider-leg,
+.bonus-mob--spiderJockey .spider-body {
+  animation-duration: 280ms;
 }
 
 .bonus-mob--aiming .bonus-mob__sprite,
